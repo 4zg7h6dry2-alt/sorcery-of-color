@@ -25,10 +25,10 @@
         <div class="atmosphere-control">
             <label for="bgThemeSelect" class="control-label">Chamber Vibe:</label>
             <select id="bgThemeSelect" class="alchemical-select">
-                <option value="midnight">Void Midnight (#101311)</option>
-                <option value="forest">Enchanted Vault (#123B2B)</option>
-                <option value="parchment">Aged Parchment (#E6DFD3)</option>
-                <option value="monolith">Obsidian Monolith (#050505)</option>
+                <option value="midnight">Midnight Boudoir (#1C1316)</option>
+                <option value="forest">Enchanted Rose (#2A1F26)</option>
+                <option value="parchment">Aged Parchment (#EFE9E3)</option>
+                <option value="monolith">Obsidian Rose (#0F0A0C)</option>
             </select>
         </div>
     </header>
@@ -57,7 +57,7 @@
             </div>
         </section>
 
-        <!-- SECTION 2: THE ALCHEMIST’S ANOMALY (Chaos & Custom Swatches) -->
+        <!-- SECTION 2: THE ALCHEMIST’S ANOMALY -->
         <section id="anomaly-section" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ The Alchemist’s Anomaly</h3>
@@ -80,9 +80,9 @@
                 <button id="brewAnomalyBtn" class="btn-alchemical">Distill Anomaly ⚡</button>
                 <button id="saveAnomalyBtn" class="btn-alchemical primary">Inscribe Anomaly 📖</button>
             </div>
-            
         </section>
-        <!-- SECTION: THE PALETTE ROULETTE (The Astrolabe Spin) -->
+
+        <!-- SECTION 3: THE PALETTE ROULETTE -->
         <section id="roulette-section" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ The Palette Roulette</h3>
@@ -101,7 +101,7 @@
             </div>
         </section>
 
-        <!-- SECTION 3: UNIVERSAL SPECTRUM CONSOLE (Cross-Platform Swatch Crafter) -->
+        <!-- SECTION 4: UNIVERSAL SPECTRUM CONSOLE -->
         <section id="spectrum-section" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ The Universal Pigment Crafter</h3>
@@ -109,33 +109,33 @@
             </div>
             
             <div class="spectrum-workspace">
-                <div class="spectrum-preview-box" id="spectrumPreviewBox" style="background: #087A50;">
-                    <span class="spectrum-hex-badge mono-text" id="spectrumHexBadge">#087A50</span>
+                <div class="spectrum-preview-box" id="spectrumPreviewBox" style="background: #C48CB3;">
+                    <span class="spectrum-hex-badge mono-text" id="spectrumHexBadge">#C48CB3</span>
                 </div>
 
                 <div class="spectrum-sliders">
                     <div class="slider-group">
                         <div class="slider-header">
                             <label for="hueSlider">HUE (SPECTRUM)</label>
-                            <span id="hueVal" class="mono-text">158°</span>
+                            <span id="hueVal" class="mono-text">320°</span>
                         </div>
-                        <input type="range" id="hueSlider" class="alchemical-slider hue-track" min="0" max="360" value="158">
+                        <input type="range" id="hueSlider" class="alchemical-slider hue-track" min="0" max="360" value="320">
                     </div>
 
                     <div class="slider-group">
                         <div class="slider-header">
                             <label for="satSlider">SATURATION (POTENCY)</label>
-                            <span id="satVal" class="mono-text">88%</span>
+                            <span id="satVal" class="mono-text">40%</span>
                         </div>
-                        <input type="range" id="satSlider" class="alchemical-slider" min="0" max="100" value="88">
+                        <input type="range" id="satSlider" class="alchemical-slider" min="0" max="100" value="40">
                     </div>
 
                     <div class="slider-group">
                         <div class="slider-header">
                             <label for="lightSlider">LIGHTNESS (LUMINANCE)</label>
-                            <span id="lightVal" class="mono-text">25%</span>
+                            <span id="lightVal" class="mono-text">65%</span>
                         </div>
-                        <input type="range" id="lightSlider" class="alchemical-slider" min="0" max="100" value="25">
+                        <input type="range" id="lightSlider" class="alchemical-slider" min="0" max="100" value="65">
                     </div>
                 </div>
             </div>
@@ -145,7 +145,34 @@
             </div>
         </section>
 
-        <!-- SECTION 4: THE CODEX INSPECTOR (Compact, All-Caps Readouts) -->
+        <!-- SECTION 5: COLOUR PERSONALITY & TEMPERATURE FINDER -->
+        <section id="personality-section" class="alchemical-card">
+            <div class="card-header">
+                <h3>✦ The Colour Personality & Temperature Finder</h3>
+                <p class="card-subtitle">Consult the arcane archives to divine a pigment's true mood, thermal alignment, and literary name.</p>
+            </div>
+
+            <div class="personality-workspace">
+                <div class="personality-input-row">
+                    <input type="color" id="personalityColorPicker" value="#C48CB3">
+                    <input type="text" id="personalityHexInput" value="#C48CB3" maxlength="7" class="alchemical-text-input-compact mono-text">
+                    <button id="divinePersonalityBtn" class="btn-alchemical primary">Divine Personality 🔮</button>
+                </div>
+
+                <div class="personality-scroll-box" id="personalityResultBox">
+                    <div class="personality-title-tag" id="personalityTitle">"Ethereal Sanctuary"</div>
+                    <p class="personality-description" id="personalityDesc">
+                        This shade leans into its spectrum, evoking ancient parchment, quiet corridors, and a luminous presence that banishes shadows from the chamber.
+                    </p>
+                    <div class="personality-meta-grid">
+                        <div class="meta-tag">Thermal: <span id="personalityTemp" class="mono-text gold-text">WARM IGNITED</span></div>
+                        <div class="meta-tag">Undertone: <span id="personalityUndertone" class="mono-text gold-text">ROYAL NIGHTSHADE</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: THE CODEX INSPECTOR -->
         <section id="inspector-section" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ The Codex Inspector</h3>
@@ -153,27 +180,27 @@
             </div>
             <div class="inspector-workspace-compact">
                 <div class="inspector-picker-group">
-                    <div id="inspectorSwatchBox" class="inspector-color-block" style="background: #123B2B;"></div>
-                    <input type="text" id="inspectHexInput" value="#123B2B" maxlength="7" class="alchemical-text-input-compact mono-text" placeholder="#000000">
+                    <div id="inspectorSwatchBox" class="inspector-color-block" style="background: #C48CB3;"></div>
+                    <input type="text" id="inspectHexInput" value="#C48CB3" maxlength="7" class="alchemical-text-input-compact mono-text" placeholder="#000000">
                 </div>
                 <div class="inspector-readouts-grid">
                     <div class="readout-pill">
                         <span class="pill-label">RGB</span>
-                        <span id="readoutRgb" class="mono-text">RGB(18, 59, 43)</span>
+                        <span id="readoutRgb" class="mono-text">RGB(196, 140, 179)</span>
                     </div>
                     <div class="readout-pill">
                         <span class="pill-label">HSL</span>
-                        <span id="readoutHsl" class="mono-text">HSL(156, 53%, 15%)</span>
+                        <span id="readoutHsl" class="mono-text">HSL(319°, 35%, 66%)</span>
                     </div>
                     <div class="readout-pill">
                         <span class="pill-label">ACCESSIBILITY</span>
-                        <span id="readoutContrast" class="mono-text gold-text">RATING: HIGH (DARK)</span>
+                        <span id="readoutContrast" class="mono-text gold-text">RATING: HIGH (LIGHT)</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 5: MY GRIMOIRE -->
+        <!-- SECTION 7: MY GRIMOIRE -->
         <section id="grimoire" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ My Grimoire</h3>
