@@ -1,4 +1,4 @@
-// Starting palette
+/// Starting palette
 const state = [
   { hex: "#FFEBEE", locked: false },
   { hex: "#F8BBD9", locked: false },
@@ -105,6 +105,7 @@ function generate() {
 
 document.getElementById("generate").addEventListener("click", (e) => {
   generate();
+  pushRecent();
   burst(e.clientX, e.clientY, "#AB47BC");
 });
 document.getElementById("copyAll").addEventListener("click", () => {
@@ -154,16 +155,17 @@ function burst(x, y, color) {
 
 /* ---------- floating background stars ---------- */
 if (!reduceMotion) {
-  const glyphs = ["✦", "✧", "◆", "✦"];
-  const tints = ["#AB47BC", "#BA68C8", "#CE93D8", "#F8BBD9"];
-  for (let n = 0; n < 28; n++) {
+  const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.6 9.4 24 12 14.6 14.6 12 24 9.4 14.6 0 12 9.4 9.4Z"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  for (let n = 0; n < 30; n++) {
     const s = document.createElement("span");
     s.className = "star";
-    s.textContent = glyphs[n % glyphs.length];
+    s.innerHTML = n % 3 === 0 ? MOON : STAR;
     s.style.left = Math.random() * 100 + "%";
     s.style.top = Math.random() * 100 + "%";
-    s.style.fontSize = 10 + Math.random() * 22 + "px";
-    s.style.color = tints[n % tints.length];
+    const size = 12 + Math.random() * 22;
+    s.style.width = size + "px";
+    s.style.height = size + "px";
     s.style.setProperty("--d", 4 + Math.random() * 5 + "s");
     s.style.setProperty("--delay", -Math.random() * 6 + "s");
     sky.appendChild(s);
@@ -225,6 +227,7 @@ function show(name) {
     document.getElementById("view-" + t.dataset.view).hidden = !on;
   });
   if (history.replaceState) history.replaceState(null, "", "#" + name);
+  if (name === "grimoire") renderGrimoire();
   window.scrollTo(0, 0);
 }
 tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.view)));
@@ -392,5 +395,164 @@ function renderAll() {
   renderExplorer();
 }
 
+
+/* ===== Phase III: My Grimoire (saved palettes, collections, recent) ===== */
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v === null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
+};
+let grimoire = store.get("soc.grimoire", []);
+let recent = store.get("soc.recent", []);
+const collections = ["Personal favourites", "Dark and mysterious", "Botanical", "Vintage", "Experimental", "Client projects"];
+let filter = "All";
+
+const labColors = () => state.map((s) => s.hex);
+
+function pushRecent() {
+  const c = labColors();
+  if (recent[0] && recent[0].join() === c.join()) return;
+  recent.unshift(c);
+  recent = recent.slice(0, 12);
+  store.set("soc.recent", recent);
+}
+
+function saveBook() { store.set("soc.grimoire", grimoire); }
+
+function savePalette(colors) {
+  grimoire.unshift({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+    name: "Untitled spell " + (grimoire.length + 1),
+    desc: "",
+    col: "Personal favourites",
+    colors: [...colors],
+  });
+  saveBook();
+  showToast("Saved to My Grimoire");
+}
+
+function loadToLab(colors) {
+  state.forEach((item, i) => {
+    item.hex = colors[i] || item.hex;
+    item.locked = false;
+    paint(i);
+    item.el.classList.remove("pop");
+    void item.el.offsetWidth;
+    item.el.classList.add("pop");
+  });
+  show("lab");
+}
+
+function make(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text) e.textContent = text;
+  return e;
+}
+function smallButton(label, onClick) {
+  const b = make("button", "pill", label);
+  b.type = "button";
+  b.addEventListener("click", onClick);
+  return b;
+}
+function strip(colors) {
+  const d = make("div", "strip");
+  colors.forEach((hex) => {
+    const b = make("button", "sw");
+    b.type = "button";
+    b.style.background = hex;
+    b.title = hex;
+    b.setAttribute("aria-label", "Copy " + hex);
+    b.addEventListener("click", (e) => { copy(hex, "Copied " + hex); burst(e.clientX, e.clientY, hex); });
+    d.appendChild(b);
+  });
+  return d;
+}
+
+function savedCard(g) {
+  const card = make("article", "gcard");
+  const name = make("input", "field gname");
+  name.value = g.name;
+  name.setAttribute("aria-label", "Palette name");
+  name.addEventListener("change", () => { g.name = name.value.trim() || "Untitled spell"; saveBook(); });
+
+  const desc = make("input", "field");
+  desc.value = g.desc;
+  desc.placeholder = "Add a description";
+  desc.setAttribute("aria-label", "Description");
+  desc.addEventListener("change", () => { g.desc = desc.value; saveBook(); });
+
+  const sel = make("select", "field");
+  sel.setAttribute("aria-label", "Collection");
+  collections.forEach((c) => { const o = make("option", "", c); o.value = c; sel.appendChild(o); });
+  sel.value = g.col;
+  sel.addEventListener("change", () => { g.col = sel.value; saveBook(); if (filter !== "All") renderGrimoire(); });
+
+  const row = make("div", "pills");
+  row.append(
+    smallButton("Use", () => loadToLab(g.colors)),
+    smallButton("Copy", () => copy(g.name + ": " + g.colors.join(", "), "Copied " + g.name)),
+  );
+  const del = smallButton("Delete", () => {
+    if (!del.classList.contains("on")) {
+      del.classList.add("on");
+      del.textContent = "Sure?";
+      setTimeout(() => { del.classList.remove("on"); del.textContent = "Delete"; }, 2200);
+      return;
+    }
+    grimoire = grimoire.filter((x) => x.id !== g.id);
+    saveBook();
+    renderGrimoire();
+  });
+  row.appendChild(del);
+  card.append(strip(g.colors), name, desc, sel, row);
+  return card;
+}
+
+function recentCard(colors) {
+  const card = make("article", "gcard");
+  card.append(strip(colors), make("p", "why", "Generated recently"));
+  const row = make("div", "pills");
+  row.append(
+    smallButton("Use", () => loadToLab(colors)),
+    smallButton("Save", () => { savePalette(colors); }),
+  );
+  card.appendChild(row);
+  return card;
+}
+
+function renderGrimoire() {
+  const f = $("gFilters");
+  f.replaceChildren(...["All", ...collections, "Recent"].map((n) => {
+    const b = smallButton(n, () => { filter = n; renderGrimoire(); });
+    b.classList.toggle("on", filter === n);
+    return b;
+  }));
+  $("copyBook").hidden = filter === "Recent";
+
+  const list = $("gList");
+  const items = filter === "Recent"
+    ? recent.map(recentCard)
+    : grimoire.filter((g) => filter === "All" || g.col === filter).map(savedCard);
+
+  if (!items.length) {
+    const empty = make("div", "panel");
+    empty.append(make("p", "why", filter === "Recent"
+      ? "Nothing generated yet. Make a palette in the Laboratory."
+      : "Nothing here yet. Save a palette from the Laboratory and it will appear in this book."));
+    empty.appendChild(smallButton("Go to the Laboratory", () => show("lab")));
+    list.replaceChildren(empty);
+    return;
+  }
+  list.replaceChildren(...items);
+}
+
+$("saveBtn").addEventListener("click", (e) => { savePalette(labColors()); burst(e.clientX, e.clientY, "#AB47BC"); });
+$("copyBook").addEventListener("click", () => {
+  if (!grimoire.length) { showToast("Your grimoire is empty"); return; }
+  copy(grimoire.map((g) => g.name + " (" + g.col + ")" + (g.desc ? "\n" + g.desc : "") + "\n" + g.colors.join(", ")).join("\n\n"), "Copied your whole grimoire");
+});
+
+/* ---------- start up ---------- */
+pushRecent();
 renderAll();
 show((location.hash || "#lab").slice(1));
