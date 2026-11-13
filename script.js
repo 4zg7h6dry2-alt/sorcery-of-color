@@ -1,5 +1,5 @@
 /* ==========================================
-   SORCERY OF COLOR: ALCHEMICAL ENGINE
+   THE ENCHANTED ATELIER: ALCHEMICAL ENGINE
    ========================================== */
 
 // --- 0. ATMOSPHERIC CHAMBER THEME SWITCHER ---
@@ -7,13 +7,12 @@ const bgThemeSelect = document.getElementById('bgThemeSelect');
 
 bgThemeSelect.addEventListener('change', (e) => {
     document.documentElement.setAttribute('data-theme', e.target.value);
-    localStorage.setItem('sorcery_theme', e.target.value);
+    localStorage.setItem('atelier_theme', e.target.value);
     showNotification(`Chamber shift: ${e.target.options[e.target.selectedIndex].text}`);
 });
 
-// Restore saved theme on load
 window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('sorcery_theme');
+    const savedTheme = localStorage.getItem('atelier_theme');
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
         bgThemeSelect.value = savedTheme;
@@ -49,9 +48,7 @@ function renderPrimaryPalette() {
         swatch.className = 'palette-swatch';
         swatch.style.backgroundColor = hex;
         
-        swatch.innerHTML = `
-            <div class="swatch-hex" title="Click to copy">${hex}</div>
-        `;
+        swatch.innerHTML = `<div class="swatch-hex" title="Click to copy">${hex}</div>`;
 
         swatch.addEventListener('click', () => {
             navigator.clipboard.writeText(hex);
@@ -67,23 +64,25 @@ function renderPrimaryPalette() {
 const anomalySwatchesContainer = document.getElementById('anomalySwatches');
 const customPickersRow = document.getElementById('customPickersRow');
 const brewAnomalyBtn = document.getElementById('brewAnomalyBtn');
+const saveAnomalyBtn = document.getElementById('saveAnomalyBtn');
 const anomalyNote = document.getElementById('anomalyNote');
 
 let anomalyColors = [];
 
+// Your custom remarks & workshop margin notes
 const alchemicalNotes = [
     "\"A volatile reaction of untamed wavelengths. Use at your own aesthetic peril.\"",
-    "\"Unexpected, but I do adore surprises."\"",
+    "\"Unexpected, but I do adore surprises.\"",
     "\"Oh..! behave!\"",
-    "\"Oh, the possibilities!"\"",
-    "\"Yuck."\"",
+    "\"Oh, the possibilities!\"",
+    "\"Yuck.\"",
     "\"Do not stare too long.\"",
-    "\"Too much? Darling, there's no such thing."\"",
-    "\"Oh, this one has character!"\"",
-    "\"There we are. Absolutely bewitching."\"",
-    "\"A little more warmth, perhaps?"\"",
-    "\"A little dramatic, aren't we?"\"",
-    "\"Not everyone can pull that off, you know."\"",
+    "\"Too much? Darling, there's no such thing.\"",
+    "\"Oh, this one has character!\"",
+    "\"There we are. Absolutely bewitching.\"",
+    "\"A little more warmth, perhaps?\"",
+    "\"A little dramatic, aren't we?\"",
+    "\"Not everyone can pull that off, you know.\"",
     "\"What in the celestial basin yielded this monstrosity.\""
 ];
 
@@ -100,7 +99,6 @@ function renderAnomalyWorkspace() {
     customPickersRow.innerHTML = '';
 
     anomalyColors.forEach((hex, index) => {
-        // Render Swatch
         const swatch = document.createElement('div');
         swatch.className = 'anomaly-swatch';
         swatch.style.backgroundColor = hex;
@@ -111,7 +109,6 @@ function renderAnomalyWorkspace() {
         });
         anomalySwatchesContainer.appendChild(swatch);
 
-        // Render Custom Picker underneath
         const pickerItem = document.createElement('div');
         pickerItem.className = 'custom-picker-item';
         
@@ -141,75 +138,81 @@ function renderAnomalyWorkspace() {
     anomalyNote.textContent = randomNote;
 }
 
-
-// --- 3. THE ALCHEMICAL CRUCIBLE (Elemental Vault Blender) ---
-const vaultSwatchesGrid = document.getElementById('vaultSwatchesGrid');
-const slotIng1 = document.getElementById('slotIng1');
-const slotIng2 = document.getElementById('slotIng2');
-const fuseBtn = document.getElementById('fuseBtn');
-const fusionSwatch = document.getElementById('fusionSwatch');
-const fusionHex = document.getElementById('fusionHex');
-
-const elementalVault = [
-    { name: "Emerald", hex: "#087A50" },
-    { name: "Forest", hex: "#123B2B" },
-    { name: "Midnight", hex: "#101311" },
-    { name: "Moss", hex: "#667653" },
-    { name: "Gold", hex: "#C5A34A" },
-    { name: "Champagne", hex: "#E4D2A0" },
-    { name: "Obsidian", hex: "#252925" },
-    { name: "Nightshade", hex: "#4A1525" }
-];
-
-let selectedIng1 = elementalVault[0].hex;
-let selectedIng2 = elementalVault[4].hex;
-let activeSlot = 1; // 1 or 2
-
-function initCrucible() {
-    vaultSwatchesGrid.innerHTML = '';
-
-    elementalVault.forEach(el => {
-        const btn = document.createElement('button');
-        btn.className = 'vault-element-btn';
-        btn.style.backgroundColor = el.hex;
-        btn.innerHTML = `<span class="vault-element-name">${el.name}</span>`;
-        
-        btn.addEventListener('click', () => {
-            if (activeSlot === 1) {
-                selectedIng1 = el.hex;
-                document.querySelector('#slotIng1 .slot-preview').style.backgroundColor = el.hex;
-                document.querySelector('#slotIng1 .slot-hex').textContent = el.hex;
-                activeSlot = 2;
-                slotIng1.classList.remove('active-slot');
-                slotIng2.classList.add('active-slot');
-            } else {
-                selectedIng2 = el.hex;
-                document.querySelector('#slotIng2 .slot-preview').style.backgroundColor = el.hex;
-                document.querySelector('#slotIng2 .slot-hex').textContent = el.hex;
-                activeSlot = 1;
-                slotIng2.classList.remove('active-slot');
-                slotIng1.classList.add('active-slot');
-            }
-        });
-
-        vaultSwatchesGrid.appendChild(btn);
+function saveAnomalyToGrimoire() {
+    if (anomalyColors.length === 0) return;
+    const grimoire = getStoredGrimoire();
+    grimoire.unshift({
+        id: Date.now(),
+        colors: [...anomalyColors],
+        date: new Date().toLocaleDateString()
     });
-
-    slotIng1.addEventListener('click', () => {
-        activeSlot = 1;
-        slotIng1.classList.add('active-slot');
-        slotIng2.classList.remove('active-slot');
-    });
-
-    slotIng2.addEventListener('click', () => {
-        activeSlot = 2;
-        slotIng2.classList.add('active-slot');
-        slotIng1.classList.remove('active-slot');
-    });
-
-    slotIng1.classList.add('active-slot');
-    fuseColors();
+    localStorage.setItem('atelier_grimoire', JSON.stringify(grimoire));
+    renderGrimoire();
+    showNotification("ANOMALY INSCRIBED TO GRIMOIRE ⚡");
 }
+
+
+// --- 3. UNIVERSAL SPECTRUM CONSOLE (HSL SLIDER CRAFTER) ---
+const hueSlider = document.getElementById('hueSlider');
+const satSlider = document.getElementById('satSlider');
+const lightSlider = document.getElementById('lightSlider');
+const hueVal = document.getElementById('hueVal');
+const satVal = document.getElementById('satVal');
+const lightVal = document.getElementById('lightVal');
+const spectrumPreviewBox = document.getElementById('spectrumPreviewBox');
+const spectrumHexBadge = document.getElementById('spectrumHexBadge');
+const copySpectrumBtn = document.getElementById('copySpectrumBtn');
+const sendToInspectorBtn = document.getElementById('sendToInspectorBtn');
+
+function hslToHex(h, s, l) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
+}
+
+function updateSpectrum() {
+    const h = parseInt(hueSlider.value);
+    const s = parseInt(satSlider.value);
+    const l = parseInt(lightSlider.value);
+
+    hueVal.textContent = `${h}°`;
+    satVal.textContent = `${s}%`;
+    lightVal.textContent = `${l}%`;
+
+    const hex = hslToHex(h, s, l);
+    spectrumPreviewBox.style.backgroundColor = hex;
+    spectrumHexBadge.textContent = hex;
+}
+
+hueSlider.addEventListener('input', updateSpectrum);
+satSlider.addEventListener('input', updateSpectrum);
+lightSlider.addEventListener('input', updateSpectrum);
+
+copySpectrumBtn.addEventListener('click', () => {
+    const hex = spectrumHexBadge.textContent;
+    navigator.clipboard.writeText(hex);
+    showNotification(`COPIED PIGMENT: ${hex}`);
+});
+
+sendToInspectorBtn.addEventListener('click', () => {
+    const hex = spectrumHexBadge.textContent;
+    updateInspector(hex);
+    window.location.hash = '#inspector-section';
+    showNotification(`INSPECTING: ${hex}`);
+});
+
+
+// --- 4. THE CODEX INSPECTOR ---
+const inspectHexInput = document.getElementById('inspectHexInput');
+const inspectorSwatchBox = document.getElementById('inspectorSwatchBox');
+const readoutRgb = document.getElementById('readoutRgb');
+const readoutHsl = document.getElementById('readoutHsl');
+const readoutContrast = document.getElementById('readoutContrast');
 
 function hexToRgb(hex) {
     let bigint = parseInt(hex.replace('#',''), 16);
@@ -219,52 +222,17 @@ function hexToRgb(hex) {
     return { r, g, b };
 }
 
-function rgbToHex(r, g, b) {
-    return "#" + [r, g, b].map(x => {
-        let hex = x.toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-    }).join('').toUpperCase();
-}
-
-function fuseColors() {
-    const c1 = hexToRgb(selectedIng1);
-    const c2 = hexToRgb(selectedIng2);
-
-    // Midpoint blend with slight alchemical variance
-    const r = Math.round((c1.r + c2.r) / 2);
-    const g = Math.round((c1.g + c2.g) / 2);
-    const b = Math.round((c1.b + c2.b) / 2);
-
-    const fusedHex = rgbToHex(r, g, b);
-    fusionSwatch.style.backgroundColor = fusedHex;
-    fusionHex.textContent = fusedHex;
-}
-
-fuseBtn.addEventListener('click', () => {
-    fuseColors();
-    showNotification(`SYNTHESIZED HYBRID: ${fusionHex.textContent}`);
-});
-
-
-// --- 4. THE CODEX INSPECTOR ---
-const inspectColorPicker = document.getElementById('inspectColorPicker');
-const inspectHexInput = document.getElementById('inspectHexInput');
-const readoutRgb = document.getElementById('readoutRgb');
-const readoutHsl = document.getElementById('readoutHsl');
-const readoutContrast = document.getElementById('readoutContrast');
-
 function updateInspector(hex) {
-    inspectColorPicker.value = hex;
+    if (!hex.startsWith('#') || hex.length !== 7) return;
     inspectHexInput.value = hex;
+    inspectorSwatchBox.style.backgroundColor = hex;
 
     const rgb = hexToRgb(hex);
     readoutRgb.textContent = `RGB(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 
-    // Simple luminance contrast calculation for rating
     const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
     readoutContrast.textContent = luminance > 0.5 ? "RATING: HIGH (LIGHT)" : "RATING: HIGH (DARK)";
 
-    // Approximate HSL calculation
     let r = rgb.r / 255, g = rgb.g / 255, b = rgb.b / 255;
     let max = Math.max(r, g, b), min = Math.min(r, g, b);
     let h, s, l = (max + min) / 2;
@@ -284,14 +252,10 @@ function updateInspector(hex) {
     readoutHsl.textContent = `HSL(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
 }
 
-inspectColorPicker.addEventListener('input', (e) => {
-    updateInspector(e.target.value.toUpperCase());
-});
-
 inspectHexInput.addEventListener('input', (e) => {
-    let val = e.target.value;
+    let val = e.target.value.toUpperCase();
     if (val.startsWith('#') && val.length === 7) {
-        updateInspector(val.toUpperCase());
+        updateInspector(val);
     }
 });
 
@@ -301,7 +265,7 @@ const grimoireArchive = document.getElementById('grimoireArchive');
 const savePaletteBtn = document.getElementById('savePaletteBtn');
 
 function getStoredGrimoire() {
-    const saved = localStorage.getItem('sorcery_grimoire');
+    const saved = localStorage.getItem('atelier_grimoire');
     return saved ? JSON.parse(saved) : [];
 }
 
@@ -309,14 +273,12 @@ function saveCurrentPaletteToGrimoire() {
     if (currentPalette.length === 0) return;
 
     const grimoire = getStoredGrimoire();
-    const newEntry = {
+    grimoire.unshift({
         id: Date.now(),
         colors: [...currentPalette],
         date: new Date().toLocaleDateString()
-    };
-
-    grimoire.unshift(newEntry);
-    localStorage.setItem('sorcery_grimoire', JSON.stringify(grimoire));
+    });
+    localStorage.setItem('atelier_grimoire', JSON.stringify(grimoire));
     
     renderGrimoire();
     showNotification("PALETTE INSCRIBED TO GRIMOIRE 📖");
@@ -325,7 +287,7 @@ function saveCurrentPaletteToGrimoire() {
 function deleteFromGrimoire(id) {
     let grimoire = getStoredGrimoire();
     grimoire = grimoire.filter(item => item.id !== id);
-    localStorage.setItem('sorcery_grimoire', JSON.stringify(grimoire));
+    localStorage.setItem('atelier_grimoire', JSON.stringify(grimoire));
     renderGrimoire();
     showNotification("PAGE TORN FROM GRIMOIRE.");
 }
@@ -423,11 +385,12 @@ try {
 generateBtn.addEventListener('click', renderPrimaryPalette);
 brewAnomalyBtn.addEventListener('click', brewAnomaly);
 savePaletteBtn.addEventListener('click', saveCurrentPaletteToGrimoire);
+saveAnomalyBtn.addEventListener('click', saveAnomalyToGrimoire);
 
 window.addEventListener('DOMContentLoaded', () => {
     renderPrimaryPalette();
     brewAnomaly();
-    initCrucible();
-    updateInspector('#123B2B');
+    updateSpectrum();
+    updateInspector('#17291F');
     renderGrimoire();
 });
