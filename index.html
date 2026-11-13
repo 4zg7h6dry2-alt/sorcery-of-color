@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorcery of Color — Where Colours Become </title>
+    <title>The Enchanted Atelier — Where Colours Become Magic</title>
     <!-- Google Fonts: Cinzel, Fraunces, Cormorant Garamond, DM Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,21 +13,21 @@
 </head>
 <body>
 
-    <!-- ALCHEMICAL HEADER -->
+    <!-- ATELIER HEADER -->
     <header class="site-header">
         <div class="logo-area">
             <span class="logo-symbol">✦</span>
-            <h1>Sorcery of Color</h1>
-            <span class="logo-subtitle">Where Colours Become </span>
+            <h1>The Enchanted Atelier</h1>
+            <span class="logo-subtitle">Where Colours Become Magic</span>
         </div>
         
         <!-- ATMOSPHERIC CHAMBER (Background Customizer) -->
         <div class="atmosphere-control">
             <label for="bgThemeSelect" class="control-label">Chamber Vibe:</label>
             <select id="bgThemeSelect" class="alchemical-select">
-                <option value="midnight">Void Midnight (#101311)</option>
-                <option value="forest">Enchanted Vault (#123B2B)</option>
-                <option value="parchment">Aged Parchment (#D8CCD6)</option>
+                <option value="midnight">Void Midnight (#101113)</option>
+                <option value="forest">Enchanted Forest (#17291F)</option>
+                <option value="parchment">Aged Parchment (#E8DDC5)</option>
                 <option value="monolith">Obsidian Monolith (#080808)</option>
             </select>
         </div>
@@ -39,25 +39,25 @@
         <!-- INTRO / MANIFESTO -->
         <section class="workshop-intro">
             <h2>The Alchemist’s Workbench</h2>
-            <p class="margin-note">// A mystical laboratory for colorful souls.</p>
+            <p class="margin-note">// Where colour meets curiosity, and creativity becomes a little bit magical.</p>
         </section>
 
         <!-- SECTION 1: THE PALETTE GENERATOR -->
         <section id="laboratory" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ Primary Essence Generator</h3>
-                <p class="card-subtitle">Five swatches bound by alchemical balance.</p>
+                <p class="card-subtitle">Five swatches bound by alchemical balance. Tap any swatch to copy.</p>
             </div>
 
             <div class="palette-grid" id="paletteGrid"></div>
 
             <div class="card-actions">
-                <button id="generateBtn" class="btn-alchemical primary">Brew New Palette ☾ </button>
-                <button id="savePaletteBtn" class="btn-alchemical">Inscribe to Grimoire ☾ </button>
+                <button id="generateBtn" class="btn-alchemical primary">Brew New Palette 🧪</button>
+                <button id="savePaletteBtn" class="btn-alchemical">Inscribe to Grimoire 📖</button>
             </div>
         </section>
 
-        <!-- SECTION 2: THE ALCHEMIST’S ANOMALY (Custom Swatches. Don't mind the mess dear) -->
+        <!-- SECTION 2: THE ALCHEMIST’S ANOMALY (Chaos & Custom Swatches) -->
         <section id="anomaly-section" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ The Alchemist’s Anomaly</h3>
@@ -78,53 +78,51 @@
 
             <div class="card-actions">
                 <button id="brewAnomalyBtn" class="btn-alchemical">Distill Anomaly ⚡</button>
+                <button id="saveAnomalyBtn" class="btn-alchemical primary">Inscribe Anomaly 📖</button>
             </div>
         </section>
 
-        <!-- SECTION 3: THE ALCHEMICAL CRUCIBLE (Primary Element Blender) -->
-        <section id="crucible-section" class="alchemical-card">
+        <!-- SECTION 3: UNIVERSAL SPECTRUM CONSOLE (Cross-Platform Swatch Crafter) -->
+        <section id="spectrum-section" class="alchemical-card">
             <div class="card-header">
-                <h3>✦ The Alchemical Crucible</h3>
-                <p class="card-subtitle">Select elemental primary pigments from the vault to synthesize a hybrid shade.</p>
+                <h3>✦ The Universal Pigment Crafter</h3>
+                <p class="card-subtitle">Smooth, precision pigment tuning calibrated for all devices.</p>
             </div>
             
-            <div class="crucible-workspace">
-                <!-- Primary Elements Selector Box -->
-                <div class="elemental-vault-box">
-                    <span class="vault-title">Elemental Pigment Vault</span>
-                    <div class="vault-swatches-grid" id="vaultSwatchesGrid">
-                        <!-- Populated dynamically with primary elements -->
-                    </div>
+            <div class="spectrum-workspace">
+                <div class="spectrum-preview-box" id="spectrumPreviewBox" style="background: #17291F;">
+                    <span class="spectrum-hex-badge mono-text" id="spectrumHexBadge">#17291F</span>
                 </div>
 
-                <!-- Active Fusion Board -->
-                <div class="fusion-board">
-                    <div class="selected-ingredients-display">
-                        <div class="active-ingredient-slot" id="slotIng1">
-                            <span class="slot-title">Ingredient I</span>
-                            <div class="slot-preview" style="background: #087A50;"></div>
-                            <span class="slot-hex mono-text">#087A50</span>
+                <div class="spectrum-sliders">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <label for="hueSlider">HUE (SPECTRUM)</label>
+                            <span id="hueVal" class="mono-text">150°</span>
                         </div>
-                        <span class="fusion-symbol"> ☾ </span>
-                        <div class="active-ingredient-slot" id="slotIng2">
-                            <span class="slot-title">Ingredient II</span>
-                            <div class="slot-preview" style="background: #C5A34A;"></div>
-                            <span class="slot-hex mono-text">#C5A34A</span>
-                        </div>
+                        <input type="range" id="hueSlider" class="alchemical-slider" min="0" max="360" value="150">
                     </div>
 
-                    <div class="fusion-action-area">
-                        <button id="fuseBtn" class="btn-alchemical">Synthesize Hybrid Essence</button>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <label for="satSlider">SATURATION (POTENCY)</label>
+                            <span id="satVal" class="mono-text">27%</span>
+                        </div>
+                        <input type="range" id="satSlider" class="alchemical-slider" min="0" max="100" value="27">
                     </div>
 
-                    <div class="fusion-result-display" id="fusionResultBox">
-                        <div class="fusion-swatch" id="fusionSwatch" style="background: #648E4D;"></div>
-                        <div class="fusion-info">
-                            <span class="fusion-title">Synthesized Hybrid Result</span>
-                            <span id="fusionHex" class="mono-text">#648E4D</span>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <label for="lightSlider">LIGHTNESS (LUMINANCE)</label>
+                            <span id="lightVal" class="mono-text">13%</span>
                         </div>
+                        <input type="range" id="lightSlider" class="alchemical-slider" min="0" max="100" value="13">
                     </div>
                 </div>
+            </div>
+            <div class="card-actions" style="margin-top: 1.25rem;">
+                <button id="copySpectrumBtn" class="btn-alchemical">Capture Pigment HEX ✦</button>
+                <button id="sendToInspectorBtn" class="btn-alchemical">Inspect in Codex 🔍</button>
             </div>
         </section>
 
@@ -132,25 +130,25 @@
         <section id="inspector-section" class="alchemical-card">
             <div class="card-header">
                 <h3>✦ The Codex Inspector</h3>
-                <p class="card-subtitle">Examine the deep structure of any pigment.</p>
+                <p class="card-subtitle">Type any HEX code or use the crafter above to dissect its structure.</p>
             </div>
             <div class="inspector-workspace-compact">
                 <div class="inspector-picker-group">
-                    <input type="color" id="inspectColorPicker" value="#123B2B">
-                    <input type="text" id="inspectHexInput" value="#123B2B" class="alchemical-text-input-compact mono-text">
+                    <div id="inspectorSwatchBox" class="inspector-color-block" style="background: #17291F;"></div>
+                    <input type="text" id="inspectHexInput" value="#17291F" maxlength="7" class="alchemical-text-input-compact mono-text" placeholder="#000000">
                 </div>
                 <div class="inspector-readouts-grid">
                     <div class="readout-pill">
                         <span class="pill-label">RGB</span>
-                        <span id="readoutRgb" class="mono-text">RGB(18, 59, 43)</span>
+                        <span id="readoutRgb" class="mono-text">RGB(23, 41, 31)</span>
                     </div>
                     <div class="readout-pill">
                         <span class="pill-label">HSL</span>
-                        <span id="readoutHsl" class="mono-text">HSL(156, 53%, 15%)</span>
+                        <span id="readoutHsl" class="mono-text">HSL(147, 28%, 13%)</span>
                     </div>
                     <div class="readout-pill">
                         <span class="pill-label">ACCESSIBILITY</span>
-                        <span id="readoutContrast" class="mono-text gold-text">RATING: HIGH</span>
+                        <span id="readoutContrast" class="mono-text gold-text">RATING: HIGH (DARK)</span>
                     </div>
                 </div>
             </div>
@@ -163,7 +161,7 @@
                 <p class="card-subtitle">Your personal codex of preserved colour combinations.</p>
             </div>
             <div class="grimoire-archive" id="grimoireArchive">
-                <p class="empty-grimoire-msg">// Your grimoire is currently blank. Inscribe a palette from above to begin your collection ;) .</p>
+                <p class="empty-grimoire-msg">// Your grimoire is currently blank. Inscribe a palette from above to begin your collection.</p>
             </div>
         </section>
 
@@ -171,7 +169,7 @@
 
     <!-- FOOTER -->
     <footer class="site-footer">
-        <p>✦ Experiment freely. Create beautifully. Embrace a little chaos. ✦</p>
+        <p>✦ Enter curious. Experiment freely. Leave inspired. ✦</p>
     </footer>
 
     <script src="script.js"></script>
