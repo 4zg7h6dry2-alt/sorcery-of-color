@@ -111,7 +111,7 @@ document.getElementById("copyAll").addEventListener("click", () => {
   copy(state.map((s) => s.hex).join(", "), "Copied all five codes");
 });
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "BUTTON") {
+  if (e.code === "Space" && !document.getElementById("view-lab").hidden && e.target.tagName !== "INPUT" && e.target.tagName !== "BUTTON") {
     e.preventDefault();
     generate();
   }
@@ -174,3 +174,223 @@ if (!reduceMotion) {
     sky.style.transform = "translate(" + x + "px," + y + "px)";
   });
 }
+
+/* ===== Phase II: views, wheel, harmony, explorer ===== */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const mod = (h) => ((h % 360) + 360) % 360;
+const hsl = (h, s, l) => hslToHex(mod(h), clamp(s, 0, 100), clamp(l, 0, 100));
+
+function hexToRgb(hex) { const n = parseInt(hex.slice(1), 16); return { r: n >> 16, g: (n >> 8) & 255, b: n & 255 }; }
+function rgbToHex(r, g, b) {
+  return "#" + [r, g, b].map((v) => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+function hexToHsl(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const R = r / 255, G = g / 255, B = b / 255;
+  const max = Math.max(R, G, B), min = Math.min(R, G, B), d = max - min;
+  const l = (max + min) / 2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (d) {
+    if (max === R) h = ((G - B) / d) % 6;
+    else if (max === G) h = (B - R) / d + 2;
+    else h = (R - G) / d + 4;
+    h *= 60;
+  }
+  return { h: Math.round(mod(h)), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+let base = hexToHsl("#AB47BC");   // shared by Harmony and Explorer
+
+function chip(hex) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "chip";
+  b.textContent = hex;
+  b.style.background = hex;
+  b.style.color = textOn(hex);
+  b.addEventListener("click", (e) => { copy(hex, "Copied " + hex); burst(e.clientX, e.clientY, hex); });
+  return b;
+}
+const fill = (el, list) => el.replaceChildren(...list.map(chip));
+
+/* ---------- tabs (no endless scrolling: one screen at a time) ---------- */
+const tabs = [...document.querySelectorAll(".tab")];
+function show(name) {
+  if (!document.getElementById("view-" + name)) name = "lab";
+  tabs.forEach((t) => {
+    const on = t.dataset.view === name;
+    t.classList.toggle("on", on);
+    t.setAttribute("aria-current", on ? "page" : "false");
+    document.getElementById("view-" + t.dataset.view).hidden = !on;
+  });
+  if (history.replaceState) history.replaceState(null, "", "#" + name);
+  window.scrollTo(0, 0);
+}
+tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.view)));
+
+/* ---------- harmony ---------- */
+const types = {
+  "Complementary": { o: [0, 180], why: "Opposites on the wheel. They make each other look brighter, so let one lead and use the other as a pop." },
+  "Analogous": { o: [-30, 0, 30], why: "Neighbours on the wheel. They blend smoothly, so the palette feels calm and natural." },
+  "Triadic": { o: [0, 120, 240], why: "Three colours spaced evenly. You get variety and balance, so let one colour lead." },
+  "Tetradic": { o: [0, 60, 180, 240], why: "Two pairs of opposites. Rich and playful, so choose one dominant colour." },
+  "Monochromatic": { o: [0], mono: true, why: "One hue in five lightness steps. It is always harmonious and easy to read." },
+  "Split complementary": { o: [0, 150, 210], why: "A colour plus the two beside its opposite. Strong contrast, but gentler than complementary." },
+  "Square": { o: [0, 90, 180, 270], why: "Four colours evenly spaced. Bold and lively, so keep the saturation moderate." },
+};
+let type = "Analogous";
+
+const typesEl = document.getElementById("types");
+Object.keys(types).forEach((name) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "pill";
+  b.textContent = name;
+  b.addEventListener("click", () => { type = name; renderAll(); });
+  typesEl.appendChild(b);
+});
+
+function harmonyColors() {
+  const t = types[type];
+  if (t.mono) return [18, 34, 50, 66, 82].map((l) => hsl(base.h, base.s, l));
+  return t.o.map((o) => hsl(base.h + o, base.s, base.l));
+}
+
+/* ---------- colour wheel (canvas) ---------- */
+const cv = document.getElementById("wheel");
+const ctx = cv.getContext("2d");
+
+function diamond(x, y, size, fill) {
+  ctx.beginPath();
+  ctx.moveTo(x, y - size); ctx.lineTo(x + size, y); ctx.lineTo(x, y + size); ctx.lineTo(x - size, y);
+  ctx.closePath();
+  ctx.fillStyle = fill; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = "#3B1B47"; ctx.stroke();
+}
+
+function drawWheel() {
+  const W = cv.width, c = W / 2, R = c - 12, r = R * 0.5;
+  ctx.clearRect(0, 0, W, W);
+  for (let i = 0; i < 90; i++) {
+    const a0 = (i / 90) * 2 * Math.PI - Math.PI / 2;
+    const a1 = ((i + 1) / 90) * 2 * Math.PI - Math.PI / 2 + 0.012;
+    ctx.beginPath();
+    ctx.arc(c, c, R, a0, a1);
+    ctx.arc(c, c, r, a1, a0, true);
+    ctx.closePath();
+    ctx.fillStyle = "hsl(" + i * 4 + ",70%,62%)";
+    ctx.fill();
+  }
+  ctx.fillStyle = hsl(base.h, base.s, base.l);
+  ctx.fillRect(c - r * 0.6, c - r * 0.6, r * 1.2, r * 1.2);
+  ctx.lineWidth = 3; ctx.strokeStyle = "#3B1B47";
+  ctx.strokeRect(c - r * 0.6, c - r * 0.6, r * 1.2, r * 1.2);
+
+  const t = types[type];
+  const hues = t.mono ? [base.h] : t.o.map((o) => base.h + o);
+  hues.forEach((h, k) => {
+    const a = (mod(h) * Math.PI) / 180 - Math.PI / 2;
+    const rr = (R + r) / 2;
+    diamond(c + Math.cos(a) * rr, c + Math.sin(a) * rr, k === 0 ? 26 : 18, k === 0 ? "#FFFFFF" : "#FFEBEE");
+  });
+}
+
+function pick(e) {
+  const rect = cv.getBoundingClientRect();
+  const x = e.clientX - rect.left - rect.width / 2;
+  const y = e.clientY - rect.top - rect.height / 2;
+  base.h = Math.round(mod((Math.atan2(x, -y) * 180) / Math.PI));
+  renderAll();
+}
+let dragging = false;
+cv.addEventListener("pointerdown", (e) => { dragging = true; cv.setPointerCapture(e.pointerId); pick(e); });
+cv.addEventListener("pointermove", (e) => { if (dragging) pick(e); });
+cv.addEventListener("pointerup", () => { dragging = false; });
+
+const satEl = document.getElementById("sat");
+const ligEl = document.getElementById("lig");
+satEl.addEventListener("input", () => { base.s = +satEl.value; renderAll(); });
+ligEl.addEventListener("input", () => { base.l = +ligEl.value; renderAll(); });
+
+document.getElementById("toLab").addEventListener("click", () => {
+  const list = harmonyColors();
+  const n0 = list.length;
+  for (let k = 0; list.length < 5; k++) {
+    const c = hexToHsl(list[k % n0]);
+    list.push(hsl(c.h, c.s, c.l + (k % 2 ? -20 : 20)));
+  }
+  state.forEach((item, i) => {
+    item.hex = list[i];
+    item.locked = false;
+    paint(i);
+    item.el.classList.remove("pop");
+    void item.el.offsetWidth;
+    item.el.classList.add("pop");
+  });
+  show("lab");
+  showToast("Sent to the Laboratory");
+});
+
+/* ---------- explorer ---------- */
+const $ = (id) => document.getElementById(id);
+
+function renderExplorer() {
+  const hex = hsl(base.h, base.s, base.l);
+  const rgb = hexToRgb(hex);
+  $("picker").value = hex.toLowerCase();
+  $("hexIn").value = hex;
+  $("rIn").value = rgb.r; $("gIn").value = rgb.g; $("bIn").value = rgb.b;
+  $("hIn").value = base.h; $("sIn").value = base.s; $("lIn").value = base.l;
+  fill($("baseChip"), [hex]);
+
+  const steps = [1, 2, 3, 4, 5];
+  const rows = [
+    ["Lighter", steps.map((k) => hsl(base.h, base.s, base.l + ((96 - base.l) * k) / 5))],
+    ["Darker", steps.map((k) => hsl(base.h, base.s, base.l * (1 - k / 6)))],
+    ["Muted", steps.map((k) => hsl(base.h, base.s * (1 - k / 5.5), base.l))],
+    ["Saturated", steps.map((k) => hsl(base.h, base.s + ((100 - base.s) * k) / 5, base.l))],
+    ["Complementary", [-16, -8, 0, 8, 16].map((d) => hsl(base.h + 180 + d, base.s, base.l))],
+    ["Similar", [-40, -20, 20, 40, 60].map((d) => hsl(base.h + d, base.s, base.l))],
+  ];
+  $("variations").replaceChildren(...rows.map(([name, list]) => {
+    const row = document.createElement("div");
+    row.className = "vrow";
+    const label = document.createElement("span");
+    label.className = "vname";
+    label.textContent = name;
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    fill(chips, list);
+    row.append(label, chips);
+    return row;
+  }));
+}
+
+function setFromHex(hex) { base = hexToHsl(hex); renderAll(); }
+$("picker").addEventListener("input", (e) => setFromHex(e.target.value.toUpperCase()));
+$("hexIn").addEventListener("change", (e) => {
+  const ok = normaliseHex(e.target.value);
+  if (ok) setFromHex(ok); else { showToast("Use a hex code like #AB47BC"); renderAll(); }
+});
+["rIn", "gIn", "bIn"].forEach((id) => $(id).addEventListener("change", () => {
+  setFromHex(rgbToHex(+$("rIn").value, +$("gIn").value, +$("bIn").value));
+}));
+["hIn", "sIn", "lIn"].forEach((id) => $(id).addEventListener("change", () => {
+  base = { h: mod(+$("hIn").value), s: clamp(+$("sIn").value, 0, 100), l: clamp(+$("lIn").value, 0, 100) };
+  renderAll();
+}));
+
+/* ---------- render everything ---------- */
+function renderAll() {
+  [...typesEl.children].forEach((b) => b.classList.toggle("on", b.textContent === type));
+  satEl.value = base.s;
+  ligEl.value = base.l;
+  drawWheel();
+  fill($("harmonyChips"), harmonyColors());
+  $("why").textContent = types[type].why;
+  renderExplorer();
+}
+
+renderAll();
+show((location.hash || "#lab").slice(1));
