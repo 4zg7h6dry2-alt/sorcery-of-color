@@ -1,177 +1,519 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="midnight">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Enchanted Atelier — Where Colours Become Magic</title>
-    <!-- Google Fonts: Cinzel, Fraunces, Cormorant Garamond, DM Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+/* ==========================================
+   THE ENCHANTED ATELIER: DESIGN SYSTEM
+   ========================================== */
+
+:root {
+    --deep-forest: #17291F;
+    --midnight: #101113;
+    --antique-gold: #C6A45B;
+    --old-parchment: #E8DDC5;
+    --obsidian-panel: #151816;
+    --text-muted: #8b968f;
     
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    /* Dynamic Theme Variables */
+    --bg-main: var(--midnight);
+    --bg-card: var(--obsidian-panel);
+    --text-primary: var(--old-parchment);
+    --text-secondary: var(--text-muted);
+    --border-accent: rgba(198, 164, 91, 0.35);
+}
 
-    <!-- ATELIER HEADER -->
-    <header class="site-header">
-        <div class="logo-area">
-            <span class="logo-symbol">✦</span>
-            <h1>The Enchanted Atelier</h1>
-            <span class="logo-subtitle">Where Colours Become Magic</span>
-        </div>
-        
-        <!-- ATMOSPHERIC CHAMBER (Background Customizer) -->
-        <div class="atmosphere-control">
-            <label for="bgThemeSelect" class="control-label">Chamber Vibe:</label>
-            <select id="bgThemeSelect" class="alchemical-select">
-                <option value="midnight">Void Midnight (#101113)</option>
-                <option value="forest">Enchanted Forest (#17291F)</option>
-                <option value="parchment">Aged Parchment (#E8DDC5)</option>
-                <option value="monolith">Obsidian Monolith (#080808)</option>
-            </select>
-        </div>
-    </header>
+[data-theme="forest"] {
+    --bg-main: #122118;
+    --bg-card: #17291F;
+    --text-primary: #E8DDC5;
+    --text-secondary: #9cb0a4;
+}
 
-    <!-- MAIN WORKSPACE -->
-    <main class="workshop-container">
+[data-theme="parchment"] {
+    --bg-main: #D9D2C3;
+    --bg-card: #E8DDC5;
+    --text-primary: #17291F;
+    --text-secondary: #4A574E;
+    --border-accent: rgba(23, 41, 31, 0.4);
+}
 
-        <!-- INTRO / MANIFESTO -->
-        <section class="workshop-intro">
-            <h2>The Alchemist’s Workbench</h2>
-            <p class="margin-note">// Where colour meets curiosity, and creativity becomes a little bit magical.</p>
-        </section>
+[data-theme="monolith"] {
+    --bg-main: #080808;
+    --bg-card: #111111;
+    --text-primary: #D4AF37;
+    --text-secondary: #666666;
+}
 
-        <!-- SECTION 1: THE PALETTE GENERATOR -->
-        <section id="laboratory" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ Primary Essence Generator</h3>
-                <p class="card-subtitle">Five swatches bound by alchemical balance. Tap any swatch to copy.</p>
-            </div>
+/* --- GLOBAL RESET & SHARP GEOMETRY --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border-radius: 0 !important; /* Strict 90-degree architectural sharpness */
+}
 
-            <div class="palette-grid" id="paletteGrid"></div>
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Fraunces', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
 
-            <div class="card-actions">
-                <button id="generateBtn" class="btn-alchemical primary">Brew New Palette 🧪</button>
-                <button id="savePaletteBtn" class="btn-alchemical">Inscribe to Grimoire 📖</button>
-            </div>
-        </section>
+.mono-text {
+    font-family: 'DM Mono', monospace;
+}
 
-        <!-- SECTION 2: THE ALCHEMIST’S ANOMALY (Chaos & Custom Swatches) -->
-        <section id="anomaly-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Alchemist’s Anomaly</h3>
-                <p class="card-subtitle">Abandon colour theory. Brew absolute chaos with custom fine-tuning.</p>
-            </div>
+.gold-text {
+    color: var(--antique-gold);
+}
 
-            <div class="anomaly-swatches" id="anomalySwatches"></div>
+/* --- HEADER & ATMOSPHERE CONTROL --- */
+.site-header {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-accent);
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
+}
 
-            <!-- Custom Swatch Fine-Tuner Row -->
-            <div class="anomaly-customizer-tray">
-                <span class="tray-label">Fine-Tune Anomaly Swatches:</span>
-                <div class="custom-pickers-row" id="customPickersRow"></div>
-            </div>
+.logo-area {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
 
-            <div class="lab-margin-note" id="anomalyNote">
-                "A volatile reaction of untamed wavelengths. Use at your own aesthetic peril."
-            </div>
+.logo-symbol {
+    color: var(--antique-gold);
+    font-size: 1.2rem;
+}
 
-            <div class="card-actions">
-                <button id="brewAnomalyBtn" class="btn-alchemical">Distill Anomaly ⚡</button>
-                <button id="saveAnomalyBtn" class="btn-alchemical primary">Inscribe Anomaly 📖</button>
-            </div>
-        </section>
+.site-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
 
-        <!-- SECTION 3: UNIVERSAL SPECTRUM CONSOLE (Cross-Platform Swatch Crafter) -->
-        <section id="spectrum-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Universal Pigment Crafter</h3>
-                <p class="card-subtitle">Smooth, precision pigment tuning calibrated for all devices.</p>
-            </div>
-            
-            <div class="spectrum-workspace">
-                <div class="spectrum-preview-box" id="spectrumPreviewBox" style="background: #17291F;">
-                    <span class="spectrum-hex-badge mono-text" id="spectrumHexBadge">#17291F</span>
-                </div>
+.logo-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    display: none;
+}
 
-                <div class="spectrum-sliders">
-                    <div class="slider-group">
-                        <div class="slider-header">
-                            <label for="hueSlider">HUE (SPECTRUM)</label>
-                            <span id="hueVal" class="mono-text">150°</span>
-                        </div>
-                        <input type="range" id="hueSlider" class="alchemical-slider" min="0" max="360" value="150">
-                    </div>
+@media(min-width: 768px) {
+    .logo-subtitle {
+        display: inline;
+    }
+}
 
-                    <div class="slider-group">
-                        <div class="slider-header">
-                            <label for="satSlider">SATURATION (POTENCY)</label>
-                            <span id="satVal" class="mono-text">27%</span>
-                        </div>
-                        <input type="range" id="satSlider" class="alchemical-slider" min="0" max="100" value="27">
-                    </div>
+.atmosphere-control {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
 
-                    <div class="slider-group">
-                        <div class="slider-header">
-                            <label for="lightSlider">LIGHTNESS (LUMINANCE)</label>
-                            <span id="lightVal" class="mono-text">13%</span>
-                        </div>
-                        <input type="range" id="lightSlider" class="alchemical-slider" min="0" max="100" value="13">
-                    </div>
-                </div>
-            </div>
-            <div class="card-actions" style="margin-top: 1.25rem;">
-                <button id="copySpectrumBtn" class="btn-alchemical">Capture Pigment HEX ✦</button>
-                <button id="sendToInspectorBtn" class="btn-alchemical">Inspect in Codex 🔍</button>
-            </div>
-        </section>
+.control-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--antique-gold);
+}
 
-        <!-- SECTION 4: THE CODEX INSPECTOR (Compact, All-Caps Readouts) -->
-        <section id="inspector-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Codex Inspector</h3>
-                <p class="card-subtitle">Type any HEX code or use the crafter above to dissect its structure.</p>
-            </div>
-            <div class="inspector-workspace-compact">
-                <div class="inspector-picker-group">
-                    <div id="inspectorSwatchBox" class="inspector-color-block" style="background: #17291F;"></div>
-                    <input type="text" id="inspectHexInput" value="#17291F" maxlength="7" class="alchemical-text-input-compact mono-text" placeholder="#000000">
-                </div>
-                <div class="inspector-readouts-grid">
-                    <div class="readout-pill">
-                        <span class="pill-label">RGB</span>
-                        <span id="readoutRgb" class="mono-text">RGB(23, 41, 31)</span>
-                    </div>
-                    <div class="readout-pill">
-                        <span class="pill-label">HSL</span>
-                        <span id="readoutHsl" class="mono-text">HSL(147, 28%, 13%)</span>
-                    </div>
-                    <div class="readout-pill">
-                        <span class="pill-label">ACCESSIBILITY</span>
-                        <span id="readoutContrast" class="mono-text gold-text">RATING: HIGH (DARK)</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+.alchemical-select {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    border: 1px solid var(--antique-gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+    outline: none;
+}
 
-        <!-- SECTION 5: MY GRIMOIRE -->
-        <section id="grimoire" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ My Grimoire</h3>
-                <p class="card-subtitle">Your personal codex of preserved colour combinations.</p>
-            </div>
-            <div class="grimoire-archive" id="grimoireArchive">
-                <p class="empty-grimoire-msg">// Your grimoire is currently blank. Inscribe a palette from above to begin your collection.</p>
-            </div>
-        </section>
+/* --- WORKSHOP CONTAINER --- */
+.workshop-container {
+    max-width: 1040px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    flex: 1;
+}
 
-    </main>
+.workshop-intro {
+    text-align: center;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border-accent);
+    padding-bottom: 2rem;
+}
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
-        <p>✦ Enter curious. Experiment freely. Leave inspired. ✦</p>
-    </footer>
+.workshop-intro h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem;
+    letter-spacing: 0.06em;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+.margin-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* --- ATELIER CARDS (PANELS) --- */
+.alchemical-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-accent);
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+    position: relative;
+}
+
+.alchemical-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--antique-gold), var(--deep-forest), var(--antique-gold));
+}
+
+.card-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(198, 164, 91, 0.15);
+    padding-bottom: 0.85rem;
+}
+
+.card-header h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.3rem;
+}
+
+.card-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* --- PALETTE GRIDS & SWATCHES --- */
+.palette-grid, .anomaly-swatches {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media(min-width: 640px) {
+    .palette-grid, .anomaly-swatches {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.palette-swatch, .anomaly-swatch {
+    height: 155px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.75rem;
+    position: relative;
+    box-shadow: inset 0 0 18px rgba(0,0,0,0.45);
+    border: 1px solid rgba(198, 164, 91, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.palette-swatch:hover, .anomaly-swatch:hover {
+    transform: translateY(-4px);
+    border-color: var(--antique-gold);
+}
+
+.swatch-hex, .anomaly-hex {
+    background: rgba(16, 17, 19, 0.9);
+    color: var(--old-parchment);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.5rem;
+    text-align: center;
+    border: 1px solid rgba(198, 164, 91, 0.4);
+    letter-spacing: 0.05em;
+}
+
+/* --- ANOMALY CUSTOMIZER TRAY --- */
+.anomaly-customizer-tray {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-accent);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tray-label {
+    font-family: 'Fraunces', serif;
+    font-size: 0.9rem;
+    color: var(--antique-gold);
+    letter-spacing: 0.03em;
+}
+
+.custom-pickers-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+}
+
+.custom-picker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.custom-picker-item input[type="color"] {
+    width: 100%;
+    height: 32px;
+    border: 1px solid var(--antique-gold);
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* --- UNIVERSAL SPECTRUM CONSOLE (SLIDERS) --- */
+.spectrum-workspace {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media(min-width: 768px) {
+    .spectrum-workspace {
+        grid-template-columns: 200px 1fr;
+        align-items: center;
+    }
+}
+
+.spectrum-preview-box {
+    height: 120px;
+    border: 1px solid var(--antique-gold);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0.75rem;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+.spectrum-hex-badge {
+    background: rgba(16, 17, 19, 0.9);
+    color: var(--old-parchment);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+    border: 1px solid rgba(198, 164, 91, 0.4);
+}
+
+.spectrum-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--antique-gold);
+}
+
+.alchemical-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--bg-main);
+    border: 1px solid var(--antique-gold);
+    outline: none;
+}
+
+.alchemical-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 22px;
+    background: var(--antique-gold);
+    cursor: pointer;
+    border: 1px solid var(--midnight);
+}
+
+/* --- LAB MARGIN NOTES --- */
+.lab-margin-note {
+    font-family: 'DM Mono', monospace;
+    color: var(--antique-gold);
+    background: rgba(23, 41, 31, 0.25);
+    border-left: 3px solid var(--antique-gold);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+/* --- FORGED OBSIDIAN & GOLD BUTTONS --- */
+.card-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-alchemical {
+    background: #101113;
+    color: var(--old-parchment);
+    border: 1px solid var(--antique-gold);
+    outline: 1px solid rgba(198, 164, 91, 0.25);
+    outline-offset: -4px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.85rem 1.75rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.btn-alchemical:hover {
+    background: var(--antique-gold);
+    color: #101113;
+    outline-color: #101113;
+    box-shadow: 0 0 20px rgba(198, 164, 91, 0.35);
+}
+
+.btn-alchemical.primary {
+    background: var(--deep-forest);
+    border-color: var(--antique-gold);
+}
+
+.btn-alchemical.primary:hover {
+    background: #243d2f;
+    color: #ffffff;
+    outline-color: var(--old-parchment);
+    box-shadow: 0 0 20px rgba(23, 41, 31, 0.5);
+}
+
+/* --- CODEX INSPECTOR --- */
+.inspector-workspace-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media(min-width: 768px) {
+    .inspector-workspace-compact {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.inspector-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.inspector-color-block {
+    width: 48px;
+    height: 40px;
+    border: 1px solid var(--antique-gold);
+}
+
+.alchemical-text-input-compact {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    border: 1px solid var(--antique-gold);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    width: 115px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.inspector-readouts-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 0.75rem;
+    flex: 1;
+}
+
+@media(min-width: 640px) {
+    .inspector-readouts-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.readout-pill {
+    background: var(--bg-main);
+    border: 1px solid var(--border-accent);
+    padding: 0.55rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-transform: uppercase;
+}
+
+.pill-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+}
+
+.readout-pill .mono-text {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* --- GRIMOIRE ARCHIVE --- */
+.grimoire-archive {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.empty-grimoire-msg {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 2rem;
+}
+
+/* --- FOOTER --- */
+.site-footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border-accent);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    background: var(--bg-card);
+}
