@@ -184,3 +184,115 @@ h1 {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ===== Phase II: tabs, views, wheel, harmony, explorer ===== */
+.top { padding: 1.3rem 1.25rem .5rem; }
+h1 { font-size: clamp(1.7rem, 7vw, 3.1rem); }
+.motto { font-size: 1.15rem; margin-top: .3rem; }
+.tabs { display: flex; justify-content: center; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+.tab {
+  padding: .55rem 1.1rem;
+  border: 1px solid var(--plum);
+  background: #fff8;
+  color: var(--plum);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: .8rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--lilac);
+  transition: transform .12s, box-shadow .12s, background .12s;
+}
+.tab:hover { transform: translate(-1px, -1px); }
+.tab.on { background: var(--fuchsia); color: #fff; box-shadow: 3px 3px 0 var(--plum); }
+
+.stage { position: relative; max-width: 1100px; margin: 0 auto; padding: .8rem 1.25rem 2rem; }
+.view[hidden] { display: none; }
+.view { animation: viewIn .45s cubic-bezier(.2,.9,.2,1); }
+@keyframes viewIn { from { opacity: 0; transform: translateY(16px); } }
+.swatch { min-height: min(380px, 46vh); }
+@media (max-width: 720px) { .swatch { min-height: 96px; } }
+
+.split { display: grid; gap: 1.5rem; align-items: start; }
+@media (min-width: 820px) { .split { grid-template-columns: minmax(260px, 340px) 1fr; } }
+.wheel-box { display: flex; justify-content: center; }
+#wheel {
+  width: 100%; max-width: 320px; aspect-ratio: 1;
+  touch-action: none; cursor: crosshair;
+  border: 1px solid var(--plum);
+  background: #fff6;
+  box-shadow: 6px 6px 0 var(--plum);
+}
+
+.panel { display: flex; flex-direction: column; gap: .9rem; }
+.pills { display: flex; flex-wrap: wrap; gap: .4rem; }
+.pill {
+  padding: .35rem .7rem;
+  border: 1px solid var(--plum);
+  background: #fff8;
+  color: var(--plum);
+  font-family: var(--display);
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.pill.on { background: var(--plum); color: var(--pink-pale); }
+.ctl {
+  display: grid; grid-template-columns: 6.5rem 1fr; align-items: center; gap: .5rem;
+  font-family: var(--display); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
+}
+input[type=range] { width: 100%; accent-color: var(--fuchsia); }
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  flex: 1; min-width: 84px; height: 64px;
+  border: 1px solid var(--plum);
+  font-family: var(--display); font-weight: 700; font-size: .8rem; letter-spacing: .06em;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--plum);
+  transition: transform .15s, box-shadow .15s;
+}
+.chip:hover { transform: translateY(-4px); box-shadow: 3px 7px 0 var(--fuchsia); }
+.why { margin: 0; font-family: var(--heading); font-style: italic; }
+
+.field {
+  width: 100%; padding: .4rem .5rem;
+  border: 1px solid var(--plum);
+  background: #fffc; color: var(--plum);
+  font-family: var(--display); font-size: .9rem; letter-spacing: .06em;
+}
+.nums { display: grid; grid-template-columns: 3rem repeat(3, 1fr); gap: .4rem; align-items: center; font-family: var(--display); font-size: .75rem; }
+input[type=color] { width: 100%; height: 44px; border: 1px solid var(--plum); padding: 0; background: none; cursor: pointer; }
+
+.vrow { display: grid; grid-template-columns: 7rem 1fr; gap: .6rem; align-items: center; }
+.vname { font-family: var(--display); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+.vrow .chip { height: 44px; min-width: 0; font-size: .65rem; }
+@media (max-width: 720px) {
+  .vrow { grid-template-columns: 1fr; gap: .3rem; }
+  .vrow .chip { height: 38px; }
+  .chip { min-width: 64px; }
+}
+
+/* ===== Footer line in Bodoni Moda ===== */
+.foot { padding: 1rem 1.25rem 1.4rem; }
+.foot p {
+  font-family: "Bodoni Moda", serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 1rem;
+  letter-spacing: .08em;
+  color: var(--plum);
+}
+
+/* ===== Tip line in Bodoni Moda ===== */
+.tip {
+  font-family: "Bodoni Moda", serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: .95rem;
+  letter-spacing: .06em;
+  line-height: 1.6;
+  text-wrap: balance;
+}
