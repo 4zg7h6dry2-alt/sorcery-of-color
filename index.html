@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,7 +7,7 @@
   <meta name="description" content="Where colours become magic. A cute colour laboratory for making palettes.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@500&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,22 +17,68 @@
   <header class="top">
     <h1>Sorcery of Color</h1>
     <p class="motto">Where colours become magic.</p>
+    <nav class="tabs" aria-label="Sections">
+      <button class="tab" data-view="lab" type="button">Laboratory</button>
+      <button class="tab" data-view="harmony" type="button">Harmony</button>
+      <button class="tab" data-view="explorer" type="button">Explorer</button>
+    </nav>
   </header>
 
-  <main class="lab">
-    <h2 class="lab-title">The Laboratory</h2>
+  <main class="stage">
 
-    <div class="palette" id="palette"></div>
+    <!-- LABORATORY -->
+    <section class="view" id="view-lab">
+      <h2 class="lab-title">The Laboratory</h2>
+      <div class="palette" id="palette"></div>
+      <div class="actions">
+        <button class="cast" id="generate" type="button">Generate palette</button>
+        <button class="ghost" id="copyAll" type="button">Copy all codes</button>
+      </div>
+      <p class="tip">Press the space bar to generate. Lock a colour to keep it.</p>
+    </section>
 
-    <div class="actions">
-      <button class="cast" id="generate">Generate palette</button>
-      <button class="ghost" id="copyAll">Copy all codes</button>
-    </div>
-    <p class="tip">Press the space bar to generate. Lock a colour to keep it.</p>
+    <!-- HARMONY -->
+    <section class="view" id="view-harmony" hidden>
+      <h2 class="lab-title">Colour Harmony</h2>
+      <div class="split">
+        <div class="wheel-box"><canvas id="wheel" width="600" height="600" aria-label="Colour wheel. Tap or drag to choose a base hue."></canvas></div>
+        <div class="panel">
+          <div class="pills" id="types"></div>
+          <label class="ctl">Saturation <input type="range" id="sat" min="0" max="100"></label>
+          <label class="ctl">Lightness <input type="range" id="lig" min="5" max="95"></label>
+          <div class="chips" id="harmonyChips"></div>
+          <p class="why" id="why"></p>
+          <div><button class="cast" id="toLab" type="button">Send to Laboratory</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPLORER -->
+    <section class="view" id="view-explorer" hidden>
+      <h2 class="lab-title">Colour Explorer</h2>
+      <div class="split">
+        <div class="panel">
+          <input type="color" id="picker" aria-label="Pick a colour">
+          <input class="field" id="hexIn" maxlength="7" spellcheck="false" aria-label="Hex code">
+          <div class="nums"><span>RGB</span>
+            <input class="field" id="rIn" type="number" min="0" max="255" aria-label="Red">
+            <input class="field" id="gIn" type="number" min="0" max="255" aria-label="Green">
+            <input class="field" id="bIn" type="number" min="0" max="255" aria-label="Blue"></div>
+          <div class="nums"><span>HSL</span>
+            <input class="field" id="hIn" type="number" min="0" max="360" aria-label="Hue">
+            <input class="field" id="sIn" type="number" min="0" max="100" aria-label="Saturation">
+            <input class="field" id="lIn" type="number" min="0" max="100" aria-label="Lightness"></div>
+          <div class="chips" id="baseChip"></div>
+          <p class="why">Tap any swatch to copy its code.</p>
+        </div>
+        <div class="panel" id="variations"></div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="foot">
-    <p>Experiment freely. Create beautifully ✦</p>
+    <p>Experiment freely. Create beautifully. Embrace a little chaos. ✦</p>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
