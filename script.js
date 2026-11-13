@@ -179,6 +179,75 @@ function saveAnomalyToGrimoire() {
 }
 
 
+// --- 2.5 THE PALETTE ROULETTE (Astrolabe Spin) ---
+const rouletteGrid = document.getElementById('rouletteGrid');
+const spinRouletteBtn = document.getElementById('spinRouletteBtn');
+const saveRouletteBtn = document.getElementById('saveRouletteBtn');
+const rouletteNote = document.getElementById('rouletteNote');
+
+let currentRoulettePalette = [];
+
+const rouletteFortunes = [
+    "\"The brass rings align... A rare convergence of shadow and gold.\"",
+    "\"The wheel screeches, stalls, and reveals a shockingly opulent decree.\"",
+    "\"A gambler's draw. The cards—and the colours—never lie.\"",
+    "\"Spun from the ether. Do not question the astrolabe's wisdom.\"",
+    "\"A reckless roll of the bones yields an astonishing masterpiece.\"",
+    "\"The alignment is volatile. Use this palette before the spell wears off.\"",
+    "\"Drawn from the deepest trenches of the chromatic abyss. Magnificent.\""
+];
+
+function spinRoulette() {
+    currentRoulettePalette = [];
+    rouletteGrid.innerHTML = '';
+    rouletteGrid.style.opacity = '0.4';
+    
+    setTimeout(() => {
+        for (let i = 0; i < 5; i++) {
+            const hex = generateRandomHex();
+            currentRoulettePalette.push(hex);
+
+            const swatch = document.createElement('div');
+            swatch.className = 'palette-swatch';
+            swatch.style.backgroundColor = hex;
+            swatch.innerHTML = `<div class="swatch-hex" title="Click to copy">${hex}</div>`;
+
+            swatch.addEventListener('click', () => {
+                navigator.clipboard.writeText(hex);
+                showNotification(`ROULETTE ESSENCE CAPTURED: ${hex}`);
+                updateInspector(hex);
+            });
+
+            rouletteGrid.appendChild(swatch);
+        }
+        rouletteGrid.style.opacity = '1';
+        
+        const randomFortune = rouletteFortunes[Math.floor(Math.random() * rouletteFortunes.length)];
+        rouletteNote.textContent = randomFortune;
+        showNotification("THE WHEEL HAS SPOKEN 🎡");
+    }, 200);
+}
+
+function saveRouletteToGrimoire() {
+    if (currentRoulettePalette.length === 0) return;
+
+    const grimoire = getStoredGrimoire();
+    const newEntry = {
+        id: Date.now(),
+        colors: [...currentRoulettePalette],
+        date: new Date().toLocaleDateString()
+    };
+
+    grimoire.unshift(newEntry);
+    localStorage.setItem('sorcery_grimoire', JSON.stringify(grimoire));
+    renderGrimoire();
+    showNotification("ROULETTE INSCRIBED TO GRIMOIRE 📖");
+}
+
+spinRouletteBtn.addEventListener('click', spinRoulette);
+saveRouletteBtn.addEventListener('click', saveRouletteToGrimoire);
+
+
 // --- 3. UNIVERSAL SPECTRUM CONSOLE (HSL Sliders) ---
 const hueSlider = document.getElementById('hueSlider');
 const satSlider = document.getElementById('satSlider');
@@ -191,7 +260,7 @@ const spectrumHexBadge = document.getElementById('spectrumHexBadge');
 const copySpectrumBtn = document.getElementById('copySpectrumBtn');
 const sendToInspectorBtn = document.getElementById('sendToInspectorBtn');
 
-let currentSpectrumHex = "#087A50";
+let currentSpectrumHex = "#C48CB3";
 
 function hslToHex(h, s, l) {
     l /= 100;
@@ -234,7 +303,68 @@ sendToInspectorBtn.addEventListener('click', () => {
 });
 
 
-// --- 4. THE CODEX INSPECTOR ---
+// --- 4. COLOUR PERSONALITY & TEMPERATURE FINDER ---
+const personalityColorPicker = document.getElementById('personalityColorPicker');
+const personalityHexInput = document.getElementById('personalityHexInput');
+const divinePersonalityBtn = document.getElementById('divinePersonalityBtn');
+const personalityTitle = document.getElementById('personalityTitle');
+const personalityDesc = document.getElementById('personalityDesc');
+const personalityTemp = document.getElementById('personalityTemp');
+const personalityUndertone = document.getElementById('personalityUndertone');
+
+const personalityAdjectives = ["Gilded", "Obsidian", "Sovereign", "Melancholy", "Verdant", "Ethereal", "Crimson", "Midnight", "Aged", "Hollow", "Feral", "Celadon"];
+const personalityNouns = ["Sepulcher", "Archive", "Twilight", "Velvet", "Abyss", "Sanctuary", "Relic", "Solitude", "Theorem", "Whisper", "Vow", "Eclipse"];
+
+function divineColourPersonality(hex) {
+    personalityColorPicker.value = hex;
+    personalityHexInput.value = hex;
+
+    const rgb = hexToRgb(hex);
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+    let thermal = "NEUTRAL BALANCED";
+    if ((hsl.h >= 0 && hsl.h < 50) || (hsl.h >= 330 && hsl.h <= 360)) thermal = "WARM IGNITED";
+    else if (hsl.h >= 170 && hsl.h < 280) thermal = "COOL SUB-ZERO";
+
+    let undertone = "EARTHEN CLAY";
+    if (hsl.h >= 40 && hsl.h < 90) undertone = "SOLAR AMBER";
+    else if (hsl.h >= 90 && hsl.h < 170) undertone = "FOREST VERDANT";
+    else if (hsl.h >= 170 && hsl.h < 260) undertone = "DEEP ABYSSAL";
+    else if (hsl.h >= 260 && hsl.h < 330) undertone = "ROYAL NIGHTSHADE";
+
+    const adjIdx = (rgb.r + rgb.g) % personalityAdjectives.length;
+    const nounIdx = (rgb.g + rgb.b) % personalityNouns.length;
+    const titleName = `"${personalityAdjectives[adjIdx]} ${personalityNouns[nounIdx]}"`;
+
+    let vibe = "contemplative aura suited for solitary study.";
+    if (hsl.l > 70) vibe = "luminous presence that banishes shadows from the chamber.";
+    else if (hsl.l < 25) vibe = "heavy, secretive weight found only in locked vaults.";
+
+    personalityTitle.textContent = titleName;
+    personalityDesc.textContent = `This shade leans into its ${thermal.toLowerCase()} spectrum, evoking ancient parchment, quiet corridors, and a ${vibe}`;
+    personalityTemp.textContent = thermal;
+    personalityUndertone.textContent = undertone;
+
+    showNotification(`PERSONALITY DIVINED: ${titleName}`);
+}
+
+personalityColorPicker.addEventListener('input', (e) => {
+    divineColourPersonality(e.target.value.toUpperCase());
+});
+
+personalityHexInput.addEventListener('input', (e) => {
+    let val = e.target.value.toUpperCase();
+    if (val.length === 7 || val.length === 4) {
+        divineColourPersonality(val);
+    }
+});
+
+divinePersonalityBtn.addEventListener('click', () => {
+    divineColourPersonality(personalityHexInput.value);
+});
+
+
+// --- 5. THE CODEX INSPECTOR ---
 const inspectHexInput = document.getElementById('inspectHexInput');
 const inspectorSwatchBox = document.getElementById('inspectorSwatchBox');
 const readoutRgb = document.getElementById('readoutRgb');
@@ -299,7 +429,7 @@ inspectHexInput.addEventListener('input', (e) => {
 });
 
 
-// --- 5. MY GRIMOIRE ---
+// --- 6. MY GRIMOIRE ---
 const grimoireArchive = document.getElementById('grimoireArchive');
 
 function getStoredGrimoire() {
@@ -379,7 +509,7 @@ function renderGrimoire() {
 }
 
 
-// --- 6. NOTIFICATION SYSTEM ---
+// --- 7. NOTIFICATION SYSTEM ---
 function showNotification(message) {
     const existing = document.getElementById('alchemicalNotice');
     if (existing) existing.remove();
@@ -393,12 +523,12 @@ function showNotification(message) {
         right: 2rem;
         background: var(--bg-card);
         color: var(--text-primary);
-        border: 1px solid var(--antique-gold);
+        border: 1px solid var(--rose-petal);
         padding: 0.75rem 1.25rem;
         font-family: 'Cinzel', serif;
         font-size: 0.75rem;
         letter-spacing: 0.1em;
-        box-shadow: 0 5px 25px rgba(0,0,0,0.8);
+        box-shadow: 0 5px 25px rgba(0,0,0,0.6);
         z-index: 1000;
         text-transform: uppercase;
         animation: fadeInOut 2.5s ease forwards;
@@ -421,16 +551,19 @@ try {
 } catch (e) {}
 
 
-// --- 7. INITIALIZATION ---
+// --- 8. INITIALIZATION ---
 generateBtn.addEventListener('click', renderPrimaryPalette);
 brewAnomalyBtn.addEventListener('click', brewAnomaly);
 saveAnomalyBtn.addEventListener('click', saveAnomalyToGrimoire);
 savePaletteBtn.addEventListener('click', saveCurrentPaletteToGrimoire);
+spinRouletteBtn.addEventListener('click', spinRoulette);
+saveRouletteBtn.addEventListener('click', saveRouletteToGrimoire);
 
 window.addEventListener('DOMContentLoaded', () => {
     renderPrimaryPalette();
     brewAnomaly();
+    spinRoulette();
     updateSpectrum();
-    updateInspector('#123B2B');
+    updateInspector('#C48CB3');
     renderGrimoire();
 });
