@@ -1,5 +1,5 @@
 /* ==========================================
-   THE ENCHANTED ATELIER: ALCHEMICAL ENGINE
+   SORCERY OF COLOR: ALCHEMICAL ENGINE
    ========================================== */
 
 // --- 0. ATMOSPHERIC CHAMBER THEME SWITCHER ---
@@ -7,12 +7,12 @@ const bgThemeSelect = document.getElementById('bgThemeSelect');
 
 bgThemeSelect.addEventListener('change', (e) => {
     document.documentElement.setAttribute('data-theme', e.target.value);
-    localStorage.setItem('atelier_theme', e.target.value);
+    localStorage.setItem('sorcery_theme', e.target.value);
     showNotification(`Chamber shift: ${e.target.options[e.target.selectedIndex].text}`);
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('atelier_theme');
+    const savedTheme = localStorage.getItem('sorcery_theme');
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
         bgThemeSelect.value = savedTheme;
@@ -53,6 +53,7 @@ function renderPrimaryPalette() {
         swatch.addEventListener('click', () => {
             navigator.clipboard.writeText(hex);
             showNotification(`ESSENCE CAPTURED: ${hex}`);
+            updateInspector(hex);
         });
 
         paletteGrid.appendChild(swatch);
@@ -69,21 +70,41 @@ const anomalyNote = document.getElementById('anomalyNote');
 
 let anomalyColors = [];
 
-// Your custom remarks & workshop margin notes
 const alchemicalNotes = [
-    "\"A volatile reaction of untamed wavelengths. Use at your own aesthetic peril.\"",
+    "\"This one belongs in a storybook.\"",
+    "\"A whisper of something extraordinary.\"",
+    "\"How wonderfully peculiar.\"",
+    "\"If moonlight had a favourite colour, surely this would be it.\"",
+    "\"Oof!…Behave! ;)\"",
+    "\"Splendid!\"",
+    "\"Rather lovely!\"",
+    "\"Fascinating!\"",
+    "\"Not bad at all!\"",
+    "\"Aha! There it is!\"",
+    "\"Simply marvellous!\"",
+    "\"Well, fancy that!\"",
+    "\"Quite the discovery!\"",
+    "\"Oh, how pretty!\"",
+    "\"Ooh, that's rather delicious.\"",
+    "\"A little more warmth, perhaps?\"",
+    "\"Well, aren't you a pretty little thing?\"",
+    "\"Now that's a shade worth keeping.\"",
     "\"Unexpected, but I do adore surprises.\"",
-    "\"Oh..! behave!\"",
-    "\"Oh, the possibilities!\"",
-    "\"Yuck.\"",
-    "\"Do not stare too long.\"",
     "\"Too much? Darling, there's no such thing.\"",
     "\"Oh, this one has character!\"",
+    "\"A rather peculiar combination, wouldn't you say?\"",
+    "\"How charmingly unpredictable.\"",
     "\"There we are. Absolutely bewitching.\"",
-    "\"A little more warmth, perhaps?\"",
+    "\"That colour has an attitude. I approve.\"",
     "\"A little dramatic, aren't we?\"",
+    "\"Well, someone clearly enjoys attention.\"",
+    "\"How very audacious of you.\"",
+    "\"I see potential. And quite a bit of vanity.\"",
     "\"Not everyone can pull that off, you know.\"",
-    "\"What in the celestial basin yielded this monstrosity.\""
+    "\"Oh, don't be shy. Show yourself!\"",
+    "\"A bold choice. I respect the audacity.\"",
+    "\"That one's got expensive taste.\"",
+    "\"Some colours simply know they're gorgeous.\""
 ];
 
 function brewAnomaly() {
@@ -103,10 +124,13 @@ function renderAnomalyWorkspace() {
         swatch.className = 'anomaly-swatch';
         swatch.style.backgroundColor = hex;
         swatch.innerHTML = `<div class="anomaly-hex">${hex}</div>`;
+        
         swatch.addEventListener('click', () => {
             navigator.clipboard.writeText(hex);
             showNotification(`WILD ESSENCE CAPTURED: ${hex}`);
+            updateInspector(hex);
         });
+        
         anomalySwatchesContainer.appendChild(swatch);
 
         const pickerItem = document.createElement('div');
@@ -140,19 +164,22 @@ function renderAnomalyWorkspace() {
 
 function saveAnomalyToGrimoire() {
     if (anomalyColors.length === 0) return;
+
     const grimoire = getStoredGrimoire();
-    grimoire.unshift({
+    const newEntry = {
         id: Date.now(),
         colors: [...anomalyColors],
         date: new Date().toLocaleDateString()
-    });
-    localStorage.setItem('atelier_grimoire', JSON.stringify(grimoire));
+    };
+
+    grimoire.unshift(newEntry);
+    localStorage.setItem('sorcery_grimoire', JSON.stringify(grimoire));
     renderGrimoire();
-    showNotification("ANOMALY INSCRIBED TO GRIMOIRE ⚡");
+    showNotification("ANOMALY INSCRIBED TO GRIMOIRE 📖");
 }
 
 
-// --- 3. UNIVERSAL SPECTRUM CONSOLE (HSL SLIDER CRAFTER) ---
+// --- 3. UNIVERSAL SPECTRUM CONSOLE (HSL Sliders) ---
 const hueSlider = document.getElementById('hueSlider');
 const satSlider = document.getElementById('satSlider');
 const lightSlider = document.getElementById('lightSlider');
@@ -163,6 +190,8 @@ const spectrumPreviewBox = document.getElementById('spectrumPreviewBox');
 const spectrumHexBadge = document.getElementById('spectrumHexBadge');
 const copySpectrumBtn = document.getElementById('copySpectrumBtn');
 const sendToInspectorBtn = document.getElementById('sendToInspectorBtn');
+
+let currentSpectrumHex = "#087A50";
 
 function hslToHex(h, s, l) {
     l /= 100;
@@ -184,9 +213,9 @@ function updateSpectrum() {
     satVal.textContent = `${s}%`;
     lightVal.textContent = `${l}%`;
 
-    const hex = hslToHex(h, s, l);
-    spectrumPreviewBox.style.backgroundColor = hex;
-    spectrumHexBadge.textContent = hex;
+    currentSpectrumHex = hslToHex(h, s, l);
+    spectrumPreviewBox.style.backgroundColor = currentSpectrumHex;
+    spectrumHexBadge.textContent = currentSpectrumHex;
 }
 
 hueSlider.addEventListener('input', updateSpectrum);
@@ -194,16 +223,14 @@ satSlider.addEventListener('input', updateSpectrum);
 lightSlider.addEventListener('input', updateSpectrum);
 
 copySpectrumBtn.addEventListener('click', () => {
-    const hex = spectrumHexBadge.textContent;
-    navigator.clipboard.writeText(hex);
-    showNotification(`COPIED PIGMENT: ${hex}`);
+    navigator.clipboard.writeText(currentSpectrumHex);
+    showNotification(`PIGMENT CAPTURED: ${currentSpectrumHex}`);
 });
 
 sendToInspectorBtn.addEventListener('click', () => {
-    const hex = spectrumHexBadge.textContent;
-    updateInspector(hex);
-    window.location.hash = '#inspector-section';
-    showNotification(`INSPECTING: ${hex}`);
+    updateInspector(currentSpectrumHex);
+    showNotification(`INSPECTING: ${currentSpectrumHex}`);
+    document.getElementById('inspector-section').scrollIntoView({ behavior: 'smooth' });
 });
 
 
@@ -215,25 +242,20 @@ const readoutHsl = document.getElementById('readoutHsl');
 const readoutContrast = document.getElementById('readoutContrast');
 
 function hexToRgb(hex) {
-    let bigint = parseInt(hex.replace('#',''), 16);
+    let cleanHex = hex.replace('#','');
+    if (cleanHex.length === 3) {
+        cleanHex = cleanHex.split('').map(c => c + c).join('');
+    }
+    let bigint = parseInt(cleanHex, 16);
+    if (isNaN(bigint)) return { r: 0, g: 0, b: 0 };
     let r = (bigint >> 16) & 255;
     let g = (bigint >> 8) & 255;
     let b = bigint & 255;
     return { r, g, b };
 }
 
-function updateInspector(hex) {
-    if (!hex.startsWith('#') || hex.length !== 7) return;
-    inspectHexInput.value = hex;
-    inspectorSwatchBox.style.backgroundColor = hex;
-
-    const rgb = hexToRgb(hex);
-    readoutRgb.textContent = `RGB(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-    readoutContrast.textContent = luminance > 0.5 ? "RATING: HIGH (LIGHT)" : "RATING: HIGH (DARK)";
-
-    let r = rgb.r / 255, g = rgb.g / 255, b = rgb.b / 255;
+function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
     let max = Math.max(r, g, b), min = Math.min(r, g, b);
     let h, s, l = (max + min) / 2;
 
@@ -249,23 +271,39 @@ function updateInspector(hex) {
         }
         h /= 6;
     }
-    readoutHsl.textContent = `HSL(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+    return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+function updateInspector(hex) {
+    if (!hex.startsWith('#')) hex = '#' + hex;
+    inspectHexInput.value = hex;
+    inspectorSwatchBox.style.backgroundColor = hex;
+
+    const rgb = hexToRgb(hex);
+    readoutRgb.textContent = `RGB(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    readoutHsl.textContent = `HSL(${hsl.h}°, ${hsl.s}%, ${hsl.l}%)`;
+
+    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+    readoutContrast.textContent = luminance > 0.5 ? "RATING: HIGH (LIGHT)" : "RATING: HIGH (DARK)";
 }
 
 inspectHexInput.addEventListener('input', (e) => {
     let val = e.target.value.toUpperCase();
-    if (val.startsWith('#') && val.length === 7) {
-        updateInspector(val);
+    if (val.length <= 7) {
+        if (val.length === 7 || val.length === 4) {
+            updateInspector(val);
+        }
     }
 });
 
 
-// --- 5. MY GRIMOIRE (Local Storage) ---
+// --- 5. MY GRIMOIRE ---
 const grimoireArchive = document.getElementById('grimoireArchive');
-const savePaletteBtn = document.getElementById('savePaletteBtn');
 
 function getStoredGrimoire() {
-    const saved = localStorage.getItem('atelier_grimoire');
+    const saved = localStorage.getItem('sorcery_grimoire');
     return saved ? JSON.parse(saved) : [];
 }
 
@@ -273,13 +311,14 @@ function saveCurrentPaletteToGrimoire() {
     if (currentPalette.length === 0) return;
 
     const grimoire = getStoredGrimoire();
-    grimoire.unshift({
+    const newEntry = {
         id: Date.now(),
         colors: [...currentPalette],
         date: new Date().toLocaleDateString()
-    });
-    localStorage.setItem('atelier_grimoire', JSON.stringify(grimoire));
-    
+    };
+
+    grimoire.unshift(newEntry);
+    localStorage.setItem('sorcery_grimoire', JSON.stringify(grimoire));
     renderGrimoire();
     showNotification("PALETTE INSCRIBED TO GRIMOIRE 📖");
 }
@@ -287,7 +326,7 @@ function saveCurrentPaletteToGrimoire() {
 function deleteFromGrimoire(id) {
     let grimoire = getStoredGrimoire();
     grimoire = grimoire.filter(item => item.id !== id);
-    localStorage.setItem('atelier_grimoire', JSON.stringify(grimoire));
+    localStorage.setItem('sorcery_grimoire', JSON.stringify(grimoire));
     renderGrimoire();
     showNotification("PAGE TORN FROM GRIMOIRE.");
 }
@@ -318,6 +357,7 @@ function renderGrimoire() {
             mini.addEventListener('click', () => {
                 navigator.clipboard.writeText(hex);
                 showNotification(`COPIED ${hex}`);
+                updateInspector(hex);
             });
             swatchesContainer.appendChild(mini);
         });
@@ -384,13 +424,13 @@ try {
 // --- 7. INITIALIZATION ---
 generateBtn.addEventListener('click', renderPrimaryPalette);
 brewAnomalyBtn.addEventListener('click', brewAnomaly);
-savePaletteBtn.addEventListener('click', saveCurrentPaletteToGrimoire);
 saveAnomalyBtn.addEventListener('click', saveAnomalyToGrimoire);
+savePaletteBtn.addEventListener('click', saveCurrentPaletteToGrimoire);
 
 window.addEventListener('DOMContentLoaded', () => {
     renderPrimaryPalette();
     brewAnomaly();
     updateSpectrum();
-    updateInspector('#17291F');
+    updateInspector('#123B2B');
     renderGrimoire();
 });
