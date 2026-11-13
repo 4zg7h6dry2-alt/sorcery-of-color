@@ -1,223 +1,86 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="midnight">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorcery of Color — Where Colours Become Magic</title>
-    <!-- Google Fonts: Cinzel, Fraunces, Cormorant Garamond, DM Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tiny Atelier</title>
+  <meta name="description" content="Small, single-purpose tools for designers. Free, no logins.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ALCHEMICAL HEADER -->
-    <header class="site-header">
-        <div class="logo-area">
-            <span class="logo-symbol">✦</span>
-            <h1>Sorcery of Color</h1>
-            <span class="logo-subtitle">Where Colours Become Magic</span>
-        </div>
-        
-        <!-- ATMOSPHERIC CHAMBER (Background Customizer) -->
-        <div class="atmosphere-control">
-            <label for="bgThemeSelect" class="control-label">Chamber Vibe:</label>
-            <select id="bgThemeSelect" class="alchemical-select">
-                <option value="midnight">Midnight Boudoir (#1C1316)</option>
-                <option value="forest">Enchanted Rose (#2A1F26)</option>
-                <option value="parchment">Aged Parchment (#EFE9E3)</option>
-                <option value="monolith">Obsidian Rose (#0F0A0C)</option>
-            </select>
-        </div>
-    </header>
+  <header class="bar">
+    <a class="brand" href="#top">Tiny Atelier</a>
+    <a class="bar-link" href="#tools">Tools</a>
+  </header>
 
-    <!-- MAIN WORKSPACE -->
-    <main class="workshop-container">
+  <main id="top">
 
-        <!-- INTRO / MANIFESTO -->
-        <section class="workshop-intro">
-            <h2>The Alchemist’s Workbench</h2>
-            <p class="margin-note">// A mystical colour laboratory for curious minds and creative souls.</p>
-        </section>
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Tiny Atelier</h1>
+        <p class="lede">Small tools for designers. One job each, no logins, free.</p>
+        <p class="hint">Tap a swatch to copy its color.</p>
+      </div>
 
-        <!-- SECTION 1: THE PALETTE GENERATOR -->
-        <section id="laboratory" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ Primary Essence Generator</h3>
-                <p class="card-subtitle">Five swatches bound by alchemical balance. Tap any swatch to copy.</p>
-            </div>
+      <div class="fan" id="fan" aria-label="Color swatches">
+        <button class="swatch" style="--a:8deg;  --c:#FFEBEE; --t:#3B1B47" data-hex="#FFEBEE"><span class="hex">#FFEBEE</span><span class="nm">Just Pink Enough</span></button>
+        <button class="swatch" style="--a:24deg; --c:#F8BBD9; --t:#3B1B47" data-hex="#F8BBD9"><span class="hex">#F8BBD9</span><span class="nm">Manga Pink</span></button>
+        <button class="swatch" style="--a:40deg; --c:#CE93D8; --t:#3B1B47" data-hex="#CE93D8"><span class="hex">#CE93D8</span><span class="nm">Somewhere in a Fairytale</span></button>
+        <button class="swatch" style="--a:56deg; --c:#BA68C8; --t:#2A0F35" data-hex="#BA68C8"><span class="hex">#BA68C8</span><span class="nm">Lavendless</span></button>
+        <button class="swatch" style="--a:72deg; --c:#AB47BC; --t:#FFFFFF" data-hex="#AB47BC"><span class="hex">#AB47BC</span><span class="nm">Fuchsia Pheromone</span></button>
+      </div>
+    </section>
 
-            <div class="palette-grid" id="paletteGrid"></div>
+    <section class="tools" id="tools">
+      <h2>The tools</h2>
+      <p class="tools-intro">Each one is a single page you can open and use right away.</p>
 
-            <div class="card-actions">
-                <button id="generateBtn" class="btn-alchemical primary">Brew New Palette 🧪</button>
-                <button id="savePaletteBtn" class="btn-alchemical">Inscribe to Grimoire 📖</button>
-            </div>
-        </section>
+      <div class="grid">
+        <article class="card">
+          <h3>Font Matchmaker</h3>
+          <p>Swipe through typeface pairs and keep the ones that go together.</p>
+          <span class="tag">Next up</span>
+        </article>
+        <article class="card">
+          <h3>Carousel Slicer</h3>
+          <p>Cut one wide image into seamless Instagram carousel slides.</p>
+          <span class="tag">Next up</span>
+        </article>
+        <article class="card">
+          <h3>Mood to Palette</h3>
+          <p>Describe a feeling and get five colors with contrast checks.</p>
+          <span class="tag soon">Soon</span>
+        </article>
+        <article class="card">
+          <h3>Kerning Dojo</h3>
+          <p>Fix badly spaced words and see how sharp your eye is.</p>
+          <span class="tag soon">Soon</span>
+        </article>
+        <article class="card">
+          <h3>Ratio Ruler</h3>
+          <p>Lay the golden ratio, thirds, and spirals over any image.</p>
+          <span class="tag soon">Soon</span>
+        </article>
+        <article class="card">
+          <h3>Glyph Safari</h3>
+          <p>See one letter in fifty fonts and compare their personalities.</p>
+          <span class="tag soon">Soon</span>
+        </article>
+      </div>
+    </section>
 
-        <!-- SECTION 2: THE ALCHEMIST’S ANOMALY -->
-        <section id="anomaly-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Alchemist’s Anomaly</h3>
-                <p class="card-subtitle">Abandon colour theory. Brew absolute chaos with custom fine-tuning.</p>
-            </div>
+  </main>
 
-            <div class="anomaly-swatches" id="anomalySwatches"></div>
+  <footer class="foot">
+    <p>Made with plain HTML, CSS, and JavaScript.</p>
+  </footer>
 
-            <!-- Custom Swatch Fine-Tuner Row -->
-            <div class="anomaly-customizer-tray">
-                <span class="tray-label">Fine-Tune Anomaly Swatches:</span>
-                <div class="custom-pickers-row" id="customPickersRow"></div>
-            </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-            <div class="lab-margin-note" id="anomalyNote">
-                "A volatile reaction of untamed wavelengths. Use at your own aesthetic peril."
-            </div>
-
-            <div class="card-actions">
-                <button id="brewAnomalyBtn" class="btn-alchemical">Distill Anomaly ⚡</button>
-                <button id="saveAnomalyBtn" class="btn-alchemical primary">Inscribe Anomaly 📖</button>
-            </div>
-        </section>
-
-        <!-- SECTION 3: THE PALETTE ROULETTE -->
-        <section id="roulette-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Palette Roulette</h3>
-                <p class="card-subtitle">Spin the arcane wheel to summon an unpredictable, fated colour combination.</p>
-            </div>
-
-            <div class="palette-grid" id="rouletteGrid"></div>
-
-            <div class="lab-margin-note" id="rouletteNote">
-                "The brass rings align... Let the cosmos decide your palette's fate."
-            </div>
-
-            <div class="card-actions">
-                <button id="spinRouletteBtn" class="btn-alchemical primary">Spin the Wheel 🎡</button>
-                <button id="saveRouletteBtn" class="btn-alchemical">Inscribe Roulette 📖</button>
-            </div>
-        </section>
-
-        <!-- SECTION 4: UNIVERSAL SPECTRUM CONSOLE -->
-        <section id="spectrum-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Universal Pigment Crafter</h3>
-                <p class="card-subtitle">Smooth, precision pigment tuning calibrated for all devices.</p>
-            </div>
-            
-            <div class="spectrum-workspace">
-                <div class="spectrum-preview-box" id="spectrumPreviewBox" style="background: #C48CB3;">
-                    <span class="spectrum-hex-badge mono-text" id="spectrumHexBadge">#C48CB3</span>
-                </div>
-
-                <div class="spectrum-sliders">
-                    <div class="slider-group">
-                        <div class="slider-header">
-                            <label for="hueSlider">HUE (SPECTRUM)</label>
-                            <span id="hueVal" class="mono-text">320°</span>
-                        </div>
-                        <input type="range" id="hueSlider" class="alchemical-slider hue-track" min="0" max="360" value="320">
-                    </div>
-
-                    <div class="slider-group">
-                        <div class="slider-header">
-                            <label for="satSlider">SATURATION (POTENCY)</label>
-                            <span id="satVal" class="mono-text">40%</span>
-                        </div>
-                        <input type="range" id="satSlider" class="alchemical-slider" min="0" max="100" value="40">
-                    </div>
-
-                    <div class="slider-group">
-                        <div class="slider-header">
-                            <label for="lightSlider">LIGHTNESS (LUMINANCE)</label>
-                            <span id="lightVal" class="mono-text">65%</span>
-                        </div>
-                        <input type="range" id="lightSlider" class="alchemical-slider" min="0" max="100" value="65">
-                    </div>
-                </div>
-            </div>
-            <div class="card-actions" style="margin-top: 1.25rem;">
-                <button id="copySpectrumBtn" class="btn-alchemical">Capture Pigment HEX ✦</button>
-                <button id="sendToInspectorBtn" class="btn-alchemical">Inspect in Codex 🔍</button>
-            </div>
-        </section>
-
-        <!-- SECTION 5: COLOUR PERSONALITY & TEMPERATURE FINDER -->
-        <section id="personality-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Colour Personality & Temperature Finder</h3>
-                <p class="card-subtitle">Consult the arcane archives to divine a pigment's true mood, thermal alignment, and literary name.</p>
-            </div>
-
-            <div class="personality-workspace">
-                <div class="personality-input-row">
-                    <input type="color" id="personalityColorPicker" value="#C48CB3">
-                    <input type="text" id="personalityHexInput" value="#C48CB3" maxlength="7" class="alchemical-text-input-compact mono-text">
-                    <button id="divinePersonalityBtn" class="btn-alchemical primary">Divine Personality 🔮</button>
-                </div>
-
-                <div class="personality-scroll-box" id="personalityResultBox">
-                    <div class="personality-title-tag" id="personalityTitle">"Ethereal Sanctuary"</div>
-                    <p class="personality-description" id="personalityDesc">
-                        This shade leans into its spectrum, evoking ancient parchment, quiet corridors, and a luminous presence that banishes shadows from the chamber.
-                    </p>
-                    <div class="personality-meta-grid">
-                        <div class="meta-tag">Thermal: <span id="personalityTemp" class="mono-text gold-text">WARM IGNITED</span></div>
-                        <div class="meta-tag">Undertone: <span id="personalityUndertone" class="mono-text gold-text">ROYAL NIGHTSHADE</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 6: THE CODEX INSPECTOR -->
-        <section id="inspector-section" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ The Codex Inspector</h3>
-                <p class="card-subtitle">Type any HEX code or use the crafter above to dissect its structure.</p>
-            </div>
-            <div class="inspector-workspace-compact">
-                <div class="inspector-picker-group">
-                    <div id="inspectorSwatchBox" class="inspector-color-block" style="background: #C48CB3;"></div>
-                    <input type="text" id="inspectHexInput" value="#C48CB3" maxlength="7" class="alchemical-text-input-compact mono-text" placeholder="#000000">
-                </div>
-                <div class="inspector-readouts-grid">
-                    <div class="readout-pill">
-                        <span class="pill-label">RGB</span>
-                        <span id="readoutRgb" class="mono-text">RGB(196, 140, 179)</span>
-                    </div>
-                    <div class="readout-pill">
-                        <span class="pill-label">HSL</span>
-                        <span id="readoutHsl" class="mono-text">HSL(319°, 35%, 66%)</span>
-                    </div>
-                    <div class="readout-pill">
-                        <span class="pill-label">ACCESSIBILITY</span>
-                        <span id="readoutContrast" class="mono-text gold-text">RATING: HIGH (LIGHT)</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 7: MY GRIMOIRE -->
-        <section id="grimoire" class="alchemical-card">
-            <div class="card-header">
-                <h3>✦ My Grimoire</h3>
-                <p class="card-subtitle">Your personal codex of preserved colour combinations.</p>
-            </div>
-            <div class="grimoire-archive" id="grimoireArchive">
-                <p class="empty-grimoire-msg">// Your grimoire is currently blank. Inscribe a palette from above to begin your collection.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
-        <p>✦ Experiment freely. Create beautifully. Embrace a little chaos. ✦</p>
-    </footer>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
