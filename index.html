@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tiny Atelier</title>
-  <meta name="description" content="Small, single-purpose tools for designers. Free, no logins.">
+  <title>Sorcery of Color</title>
+  <meta name="description" content="Where colours become magic. A cute colour laboratory for making palettes.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
@@ -12,75 +12,30 @@
 </head>
 <body>
 
-  <header class="bar">
-    <a class="brand" href="#top">Tiny Atelier</a>
-    <a class="bar-link" href="#tools">Tools</a>
+  <div class="sky" id="sky" aria-hidden="true"></div>
+
+  <header class="top">
+    <h1>Sorcery of Color</h1>
+    <p class="motto">Where colours become magic.</p>
   </header>
 
-  <main id="top">
+  <main class="lab">
+    <h2 class="lab-title">The Laboratory</h2>
 
-    <section class="hero">
-      <div class="hero-text">
-        <h1>Tiny Atelier</h1>
-        <p class="lede">Small tools for designers. One job each, no logins, free.</p>
-        <p class="hint">Tap a swatch to copy its color.</p>
-      </div>
+    <div class="palette" id="palette"></div>
 
-      <div class="fan" id="fan" aria-label="Color swatches">
-        <button class="swatch" style="--a:8deg;  --c:#FFEBEE; --t:#3B1B47" data-hex="#FFEBEE"><span class="hex">#FFEBEE</span><span class="nm">Just Pink Enough</span></button>
-        <button class="swatch" style="--a:24deg; --c:#F8BBD9; --t:#3B1B47" data-hex="#F8BBD9"><span class="hex">#F8BBD9</span><span class="nm">Manga Pink</span></button>
-        <button class="swatch" style="--a:40deg; --c:#CE93D8; --t:#3B1B47" data-hex="#CE93D8"><span class="hex">#CE93D8</span><span class="nm">Somewhere in a Fairytale</span></button>
-        <button class="swatch" style="--a:56deg; --c:#BA68C8; --t:#2A0F35" data-hex="#BA68C8"><span class="hex">#BA68C8</span><span class="nm">Lavendless</span></button>
-        <button class="swatch" style="--a:72deg; --c:#AB47BC; --t:#FFFFFF" data-hex="#AB47BC"><span class="hex">#AB47BC</span><span class="nm">Fuchsia Pheromone</span></button>
-      </div>
-    </section>
-
-    <section class="tools" id="tools">
-      <h2>The tools</h2>
-      <p class="tools-intro">Each one is a single page you can open and use right away.</p>
-
-      <div class="grid">
-        <article class="card">
-          <h3>Font Matchmaker</h3>
-          <p>Swipe through typeface pairs and keep the ones that go together.</p>
-          <span class="tag">Next up</span>
-        </article>
-        <article class="card">
-          <h3>Carousel Slicer</h3>
-          <p>Cut one wide image into seamless Instagram carousel slides.</p>
-          <span class="tag">Next up</span>
-        </article>
-        <article class="card">
-          <h3>Mood to Palette</h3>
-          <p>Describe a feeling and get five colors with contrast checks.</p>
-          <span class="tag soon">Soon</span>
-        </article>
-        <article class="card">
-          <h3>Kerning Dojo</h3>
-          <p>Fix badly spaced words and see how sharp your eye is.</p>
-          <span class="tag soon">Soon</span>
-        </article>
-        <article class="card">
-          <h3>Ratio Ruler</h3>
-          <p>Lay the golden ratio, thirds, and spirals over any image.</p>
-          <span class="tag soon">Soon</span>
-        </article>
-        <article class="card">
-          <h3>Glyph Safari</h3>
-          <p>See one letter in fifty fonts and compare their personalities.</p>
-          <span class="tag soon">Soon</span>
-        </article>
-      </div>
-    </section>
-
+    <div class="actions">
+      <button class="cast" id="generate">Generate palette</button>
+      <button class="ghost" id="copyAll">Copy all codes</button>
+    </div>
+    <p class="tip">Press the space bar to generate. Lock a colour to keep it.</p>
   </main>
 
   <footer class="foot">
-    <p>Made with plain HTML, CSS, and JavaScript.</p>
+    <p>Experiment freely. Create beautifully ✦</p>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
   <script src="script.js"></script>
 </body>
 </html>
