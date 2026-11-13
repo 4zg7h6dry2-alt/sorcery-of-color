@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorcery of Color — Where Colours Become Magic</title>
+    <!-- Google Fonts: Cinzel for headings, Cormorant Garamond for lore, DM Sans for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Link to our style sheet (we will build this next!) -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ALCHEMICAL HEADER -->
+    <header class="site-header">
+        <div class="logo-area">
+            <span class="logo-symbol">✦</span>
+            <h1>Sorcery of Color</h1>
+            <span class="logo-subtitle">Where Colours Become Magic</span>
+        </div>
+        <nav class="main-nav">
+            <a href="#laboratory" class="nav-link active">The Laboratory</a>
+            <a href="#anomaly-section" class="nav-link">The Anomaly</a>
+            <a href="#grimoire" class="nav-link">My Grimoire</a>
+            <a href="#theory" class="nav-link">Colour Theory</a>
+        </nav>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="workshop-container">
+
+        <!-- INTRO / MANIFESTO -->
+        <section class="workshop-intro">
+            <h2>The Alchemist’s Workbench</h2>
+            <p>A mystical colour laboratory for curious minds and creative souls. Brew harmonies or summon absolute chaos.</p>
+        </section>
+
+        <!-- SECTION 1: THE PALETTE GENERATOR (The Core) -->
+        <section id="laboratory" class="alchemical-card">
+            <div class="card-header">
+                <h3>✦ Primary Essence Generator</h3>
+                <p class="card-subtitle">Five swatches bound by alchemical balance.</p>
+            </div>
+
+            <!-- Swatches Grid -->
+            <div class="palette-grid" id="paletteGrid">
+                <!-- Dynamically populated by script.js -->
+            </div>
+
+            <div class="card-actions">
+                <button id="generateBtn" class="btn-alchemical primary">Brew New Palette 🧪</button>
+                <button id="savePaletteBtn" class="btn-alchemical">Inscribe to Grimoire 📖</button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: THE ALCHEMIST'S ANOMALY (Chaos Generator) -->
+        <section id="anomaly-section" class="alchemical-card">
+            <div class="card-header">
+                <h3>✦ The Alchemist’s Anomaly</h3>
+                <p class="card-subtitle">Abandon colour theory. Brew absolute chaos.</p>
+            </div>
+
+            <!-- Wildcard Swatches Container -->
+            <div class="anomaly-swatches" id="anomalySwatches">
+                <!-- Dynamically populated by script.js -->
+            </div>
+
+            <!-- Lab Note / Flavor Text -->
+            <div class="lab-margin-note" id="anomalyNote">
+                "A volatile reaction of untamed wavelengths. Use at your own aesthetic peril."
+            </div>
+
+            <div class="card-actions">
+                <button id="brewAnomalyBtn" class="btn-alchemical">Distill Anomaly ⚡</button>
+            </div>
+        </section>
+
+        <!-- SECTION 3: MY GRIMOIRE (Saved Palettes Archive) -->
+        <section id="grimoire" class="alchemical-card">
+            <div class="card-header">
+                <h3>✦ My Grimoire</h3>
+                <p class="card-subtitle">Your personal codex of preserved colour combinations.</p>
+            </div>
+            <div class="grimoire-archive" id="grimoireArchive">
+                <p class="empty-grimoire-msg">Your grimoire is currently blank. Inscribe a palette from above to begin your collection.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <p>✦ Experiment freely. Create beautifully. Embrace a little chaos. ✦</p>
+    </footer>
+
+    <!-- Link to our JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
