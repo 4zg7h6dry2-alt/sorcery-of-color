@@ -22,8 +22,9 @@
       <button class="tab" data-view="lab" type="button" style="--i:0;--a:2deg;--c:var(--s1);--t:var(--on1)">Laboratory</button>
       <button class="tab" data-view="harmony" type="button" style="--i:1;--a:12deg;--c:var(--s2);--t:var(--on2)">Harmony</button>
       <button class="tab" data-view="explorer" type="button" style="--i:2;--a:22deg;--c:var(--s3);--t:var(--on3)">Explorer</button>
-      <button class="tab" data-view="mood" type="button" style="--i:3;--a:32deg;--c:var(--s4);--t:var(--on4)">Moodboard</button>
-      <button class="tab" data-view="grimoire" type="button" style="--i:4;--a:42deg;--c:var(--s5);--t:var(--on5)">My Grimoire</button>
+      <button class="tab" data-view="contrast" type="button" style="--i:3;--a:32deg;--c:var(--s4);--t:var(--on4)">Contrast</button>
+      <button class="tab" data-view="mood" type="button" style="--i:4;--a:42deg;--c:var(--s5);--t:var(--on5)">Moodboard</button>
+      <button class="tab" data-view="grimoire" type="button" style="--i:5;--a:52deg;--c:var(--s6);--t:var(--on6)">My Grimoire</button>
     </nav>
   </header>
 
@@ -37,6 +38,7 @@
         <button class="cast" id="generate" type="button">Generate palette</button>
         <button class="ghost" id="copyAll" type="button">Copy all codes</button>
         <button class="ghost" id="saveBtn" type="button">Save to Grimoire</button>
+        <button class="ghost" id="pngBtn" type="button">Download PNG</button>
       </div>
       <div class="pills spells">
         <button class="pill" id="surprise" type="button">Surprise me</button>
@@ -78,9 +80,31 @@
             <input class="field" id="sIn" type="number" min="0" max="100" aria-label="Saturation">
             <input class="field" id="lIn" type="number" min="0" max="100" aria-label="Lightness"></div>
           <div class="chips" id="baseChip"></div>
+          <p class="why" id="exInfo"></p>
           <p class="why">Tap any swatch to copy its code.</p>
         </div>
         <div class="panel" id="variations"></div>
+      </div>
+    </section>
+
+    <!-- CONTRAST -->
+    <section class="view" id="view-contrast" hidden>
+      <h2 class="lab-title">Contrast checker</h2>
+      <div class="split">
+        <div class="panel">
+          <div class="pairrow"><span class="vname">Text</span><input type="color" id="fgPick" aria-label="Text colour"><input class="field" id="fgHex" maxlength="7" spellcheck="false" aria-label="Text colour hex"></div>
+          <div class="pairrow"><span class="vname">Back</span><input type="color" id="bgPick" aria-label="Background colour"><input class="field" id="bgHex" maxlength="7" spellcheck="false" aria-label="Background colour hex"></div>
+          <div class="pills">
+            <button class="pill" id="swapColors" type="button">Swap</button>
+            <button class="pill" id="bestPair" type="button">Best pair from Laboratory</button>
+          </div>
+          <div class="sample" id="sample"><span class="big">Aa</span><span>The quick brown fox jumps over the lazy dog.</span></div>
+        </div>
+        <div class="panel">
+          <p class="ratio" id="ratio"></p>
+          <p class="why" id="verdict"></p>
+          <div class="checks" id="checks"></div>
+        </div>
       </div>
     </section>
 
