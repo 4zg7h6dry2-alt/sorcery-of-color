@@ -25,11 +25,16 @@ function hslToHex(h, s, l) {
 
 const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
+function darkInk() {
+  const p = css("--plum");
+  return /^#[0-9a-f]{6}$/i.test(p) && lum(p) < 0.2 ? p : "#16161D";
+}
+
 function textOn(hex) {
   const n = parseInt(hex.slice(1), 16);
   const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
   const L = 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
-  return L > 0.35 ? css("--plum") : "#FFFFFF";
+  return L > 0.35 ? darkInk() : "#FFFFFF";
 }
 
 function normaliseHex(v) {
@@ -159,19 +164,34 @@ function burst(x, y, color) {
 
 /* ---------- floating background stars ---------- */
 if (!reduceMotion) {
-  const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.6 9.4 24 12 14.6 14.6 12 24 9.4 14.6 0 12 9.4 9.4Z"/></svg>';
-  const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  for (let n = 0; n < 30; n++) {
+  // pixel-art sprites: # marks a filled pixel
+  const SPRITES = {
+    star: ["....#....", "....#....", "...###...", "...###...", "#########", "...###...", "...###...", "....#....", "....#...."],
+    plus: ["..#..", "..#..", "#####", "..#..", "..#.."],
+    moon: ["..#####.", ".####...", "####....", "###.....", "###.....", "####....", ".####...", "..#####."],
+    twinkle: [".#.", "###", ".#."],
+  };
+  const pixelSvg = (rows) => {
+    let d = "";
+    rows.forEach((row, y) => [...row].forEach((c, x) => { if (c === "#") d += "M" + x + " " + y + "h1v1h-1z"; }));
+    return '<svg viewBox="0 0 ' + rows[0].length + " " + rows.length + '" shape-rendering="crispEdges" aria-hidden="true"><path d="' + d + '"/></svg>';
+  };
+  const kinds = ["star", "plus", "moon", "twinkle", "plus", "star", "twinkle", "moon", "twinkle"];
+  for (let n = 0; n < 36; n++) {
+    const kind = kinds[n % kinds.length];
+    const rows = SPRITES[kind];
+    const scale = kind === "star" || kind === "moon" ? 1 + Math.floor(Math.random() * 2) : 2;   // whole pixels only, so the edges stay crisp
     const s = document.createElement("span");
-    s.className = "star";
-    s.innerHTML = n % 3 === 0 ? MOON : STAR;
+    s.className = "star" + (kind === "twinkle" ? " tw" : "");
+    s.innerHTML = pixelSvg(rows);
     s.style.left = Math.random() * 100 + "%";
     s.style.top = Math.random() * 100 + "%";
-    const size = 12 + Math.random() * 22;
-    s.style.width = size + "px";
-    s.style.height = size + "px";
-    s.style.setProperty("--d", 4 + Math.random() * 5 + "s");
-    s.style.setProperty("--delay", -Math.random() * 6 + "s");
+    s.style.width = rows[0].length * scale + "px";
+    s.style.height = rows.length * scale + "px";
+    s.style.setProperty("--dy", 14 + Math.random() * 14 + "s");
+    s.style.setProperty("--dx", 18 + Math.random() * 16 + "s");
+    s.style.setProperty("--tw", kind === "twinkle" ? 1.2 + Math.random() * 2.4 + "s" : 2.4 + Math.random() * 3 + "s");
+    s.style.setProperty("--delay", -Math.random() * 30 + "s");
     sky.appendChild(s);
   }
   window.addEventListener("pointermove", (e) => {
@@ -234,6 +254,7 @@ function show(name) {
   if (name === "grimoire") renderGrimoire();
   if (name === "contrast") renderContrast();
   if (name === "mood") renderMood();
+  $("dockWrap").hidden = name !== "lab";
   window.scrollTo(0, 0);
 }
 tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.view)));
@@ -317,10 +338,6 @@ cv.addEventListener("pointerdown", (e) => { dragging = true; cv.setPointerCaptur
 cv.addEventListener("pointermove", (e) => { if (dragging) pick(e); });
 cv.addEventListener("pointerup", () => { dragging = false; });
 
-const satEl = document.getElementById("sat");
-const ligEl = document.getElementById("lig");
-satEl.addEventListener("input", () => { base.s = +satEl.value; renderAll(); });
-ligEl.addEventListener("input", () => { base.l = +ligEl.value; renderAll(); });
 
 document.getElementById("toLab").addEventListener("click", () => {
   const list = harmonyColors();
@@ -395,9 +412,8 @@ $("hexIn").addEventListener("change", (e) => {
 /* ---------- render everything ---------- */
 function renderAll() {
   [...typesEl.children].forEach((b) => b.classList.toggle("on", b.textContent === type));
-  satEl.value = base.s;
-  ligEl.value = base.l;
   drawWheel();
+  drawPicker();
   fill($("harmonyChips"), harmonyColors());
   $("why").textContent = types[type].why;
   renderExplorer();
@@ -681,10 +697,76 @@ function applyList(list) {
   pushRecent();
 }
 
+/* ---------- remarks for Surprise me and The Trickster ---------- */
+const REMARKS = [
+  "Oh, that's positively scrumptious!",
+  "Well, look who's feeling fancy.",
+  "A touch of elegance never hurt.",
+  "Goodness, that's rather enchanting.",
+  "Oh!…behave! ;)",
+  "Now we're getting somewhere!",
+  "Not quite what I imagined, but delightful nonetheless.",
+  "What a curious little beauty.",
+  "I could stare at this all afternoon.",
+  "Mmm. A most agreeable shade.",
+  "Oh, you've outdone yourself, darling.",
+  "That colour has an attitude. I approve.",
+  "A little dramatic, aren't we?",
+  "Well, someone clearly enjoys attention.",
+  "How very audacious of you.",
+  "I see potential. And quite a bit of vanity.",
+  "Not everyone can pull that off, you know.",
+  "Oh, don't be shy. Show yourself!",
+  "A bold choice. I respect the audacity.",
+  "That one's got expensive taste.",
+  "Some colours simply know they're gorgeous.",
+  "A little piece of twilight, perhaps?",
+  "Like something stolen from a fairy's garden.",
+  "There's a certain magic in this one.",
+  "Well! Fancy that",
+  "Are you sure..?",
+];
+let remarkBag = [];
+let lastRemark = "";
+
+function nextRemark() {
+  if (!remarkBag.length) {
+    remarkBag = shuffle(REMARKS);
+    // never repeat the one we just showed
+    if (remarkBag[remarkBag.length - 1] === lastRemark) remarkBag.unshift(remarkBag.pop());
+  }
+  lastRemark = remarkBag.pop();
+  return lastRemark;
+}
+let remarkTimer, remarkTimer2;
+function showBox(text) {
+  const el = $("remark");
+  clearTimeout(remarkTimer);
+  clearTimeout(remarkTimer2);
+  el.textContent = text;
+  el.classList.remove("show", "hide");
+  void el.offsetWidth;
+  el.classList.add("show");
+  // stays for a few seconds, then fades away
+  remarkTimer = setTimeout(() => {
+    el.classList.add("hide");
+    remarkTimer2 = setTimeout(clearRemark, 550);
+  }, 4800);
+}
+function showRemark() { showBox("\u201C" + nextRemark() + "\u201D"); }
+function clearRemark() {
+  clearTimeout(remarkTimer);
+  clearTimeout(remarkTimer2);
+  const el = $("remark");
+  el.textContent = "";
+  el.classList.remove("show", "hide");
+}
+$("generate").addEventListener("click", clearRemark);
+
 $("surprise").addEventListener("click", (e) => {
   applyList(Array.from({ length: 5 }, () => hsl(rnd(0, 360), rnd(30, 95), rnd(25, 85))));
   burst(e.clientX, e.clientY);
-  showToast("Surprise!");
+  showRemark();
 });
 
 $("trickster").addEventListener("click", (e) => {
@@ -694,7 +776,7 @@ $("trickster").addEventListener("click", (e) => {
   const lights = shuffle([20, 90, 45, 70, 35]);
   applyList(hues.map((x, i) => hsl(x, sats[i], lights[i])));
   burst(e.clientX, e.clientY);
-  showToast("The Trickster strikes");
+  showRemark();
 });
 
 $("alchemist").addEventListener("click", (e) => {
@@ -710,7 +792,7 @@ $("alchemist").addEventListener("click", (e) => {
   let k = 0;
   applyList(state.map((s, i) => (i === src ? s.hex : v[k++])));
   burst(e.clientX, e.clientY);
-  showToast("Transformed from colour " + (src + 1));
+  showBox("Transformed from colour " + (src + 1));
 });
 
 
@@ -725,6 +807,9 @@ const THEMES = {
   "cupcake-coven": { name: "Cupcake Coven",      dots: ["#FF69B4", "#FFFACD", "#ADD8E6", "#F5DEB3", "#FFFFFF"] },
   "dune-alchemist": { name: "Dune Alchemist",        dots: ["#F5DEB3", "#D4A574", "#C77B4A", "#8B4513", "#4A2C17"] },
   "mossy-grimoire": { name: "Mossy Grimoire",     dots: ["#6BB89B", "#4A8B7A", "#2E5C5C", "#1A3D3D", "#0A1A1A"] },
+  "strawberry-matcha": { name: "Strawberry Matcha", dots: ["#FEFFF5", "#E2E1CA", "#E0B9C5", "#B2C7A6", "#3A3936"] },
+  "night-owl":         { name: "Night Owl",         dots: ["#32324F", "#28283F", "#1E1E2F", "#14141F", "#0A0A0F"] },
+  "hallows-eve":       { name: "Hallows Eve",       dots: ["#F5F5F0", "#FF9933", "#FF6600", "#3D3D3D", "#1A1A1A"] },
 };
 const themesEl = $("themes");
 const themesPanel = $("themesPanel");
@@ -842,23 +927,178 @@ function paletteCanvas(colors, name) {
   g.fillText("SORCERY OF COLOR", W - 34, H - 26);
   return cv2;
 }
-function downloadPNG(colors, name) {
-  paletteCanvas(colors, name).toBlob((blob) => {
-    if (!blob) { showToast("Could not make the image"); return; }
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = (name || "palette").toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-    showToast("Palette image saved");
-  });
+async function downloadPNG(colors, name) {
+  try { await document.fonts.load("700 38px Cinzel"); } catch (e) { /* fall back to default serif */ }
+  const canvas = paletteCanvas(colors, name);
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  if (!blob) { showToast("Could not make the image"); return; }
+  const filename = (name || "palette").toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png";
+  const file = new File([blob], filename, { type: "image/png" });
+  const url = URL.createObjectURL(blob);
+
+  const overlay = make("div", "imgdlg");
+  const box = make("div", "imgdlg-box");
+  const img = document.createElement("img");
+  img.src = url;
+  img.alt = "Your palette: " + colors.join(", ");
+  const hint = make("p", "why", "Press and hold the picture to save it, or tap Save.");
+  const row = make("div", "pills");
+  const close = () => { overlay.remove(); URL.revokeObjectURL(url); document.removeEventListener("keydown", onKey); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+
+  row.append(
+    smallButton("Save", async () => {
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: name || "Palette" });
+          return;
+        }
+      } catch (e) {
+        if (e && e.name === "AbortError") return;
+      }
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast("If nothing downloaded, press and hold the picture");
+    }),
+    smallButton("Close", close),
+  );
+  box.append(img, hint, row);
+  overlay.appendChild(box);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  document.addEventListener("keydown", onKey);
+  document.body.appendChild(overlay);
 }
 $("pngBtn").addEventListener("click", () => downloadPNG(labColors(), "Sorcery palette"));
 
+/* ===== Spell dock: pixel icons ===== */
+const ICONS = {
+  star:  ["....#....", "....#....", "...###...", "...###...", "#########", "...###...", "...###...", "....#....", "....#...."],
+  dice:  ["#######", "#.....#", "#.#.#.#", "#.....#", "#.#.#.#", "#.....#", "#######"],
+  mask:  [".#######.", "#########", "##.###.##", "#########", ".##...##.", "..#####.."],
+  flask: ["..###..", "..###..", "..###..", ".#####.", "#######", "##.####", "#######", ".#####."],
+  heart: [".##.##.", "#######", "#######", ".#####.", "..###..", "...#..."],
+  copy:  ["####...", "#..#...", "#..####", "####..#", "...#..#", "...####"],
+  lock:     ["..###..", ".#...#.", ".#...#.", "#######", "#######", "###.###", "###.###", "#######"],
+  lockopen: ["..###..", ".#...#.", ".#.....", "#######", "#######", "###.###", "###.###", "#######"],
+  help:  [".###.", "#...#", "....#", "..##.", "..#..", ".....", "..#.."],
+  down:  ["...#...", "...#...", "...#...", "#.###.#", ".#####.", "..###..", "...#..."],
+};
+function pixelIcon(rows, scale) {
+  let d = "";
+  rows.forEach((row, y) => [...row].forEach((c, x) => { if (c === "#") d += "M" + x + " " + y + "h1v1h-1z"; }));
+  const w = rows[0].length, h = rows.length;
+  return '<svg viewBox="0 0 ' + w + " " + h + '" width="' + w * scale + '" height="' + h * scale + '" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><path d="' + d + '"/></svg>';
+}
+document.querySelectorAll("[data-sprite]").forEach((el) => {
+  el.innerHTML = pixelIcon(ICONS[el.dataset.sprite], +el.dataset.scale || 2);
+});
+
+/* ===== Help window ===== */
+function openHelp() {
+  if (document.querySelector(".imgdlg.help")) return;
+  const overlay = make("div", "imgdlg help");
+  const box = make("div", "imgdlg-box helpbox");
+  const list = make("dl", "helplist");
+  [
+    ["Generate", "Makes a new palette. On a keyboard, press the space bar."],
+    ["Lock", "Tap Lock on a colour to keep it when you generate again."],
+    ["Surprise", "Five completely random colours."],
+    ["Trickster", "Unusual, clashing colours that shouldn't work, but do."],
+    ["Alchemist", "Builds a palette around your locked colour, or the first colour if none is locked."],
+    ["Lock tab", "Lock keeps the dock on screen as you scroll. Release lets it rest at the bottom of the page."],
+    ["Save", "Adds the palette to My Grimoire."],
+    ["Copy codes", "Copies all five hex codes."],
+    ["PNG", "Makes a picture of the palette."],
+  ].forEach(([t, d]) => list.append(make("dt", "", t), make("dd", "", d)));
+  const row = make("div", "pills");
+  const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  row.appendChild(smallButton("Close", close));
+  box.append(make("h3", "helptitle", "How it works"), list, row);
+  overlay.appendChild(box);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  document.addEventListener("keydown", onKey);
+  document.body.appendChild(overlay);
+}
+$("helpBtn").addEventListener("click", openHelp);
+
+/* ===== Harmony: free picker (square + hue strip) ===== */
+const svCv = $("svPick"), svCtx = svCv.getContext("2d");
+const hueCv = $("huePick"), hueCtx = hueCv.getContext("2d");
+
+function drawPicker() {
+  const W = svCv.width, H = svCv.height;
+  svCtx.fillStyle = "hsl(" + base.h + ",100%,50%)";
+  svCtx.fillRect(0, 0, W, H);
+  let g = svCtx.createLinearGradient(0, 0, W, 0);
+  g.addColorStop(0, "#fff"); g.addColorStop(1, "rgba(255,255,255,0)");
+  svCtx.fillStyle = g; svCtx.fillRect(0, 0, W, H);
+  g = svCtx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "#000");
+  svCtx.fillStyle = g; svCtx.fillRect(0, 0, W, H);
+
+  // where the current colour sits in the square
+  const l = base.l / 100, sl = base.s / 100;
+  const v = l + sl * Math.min(l, 1 - l);
+  const sv = v === 0 ? 0 : 2 * (1 - l / v);
+  const px = sv * W, py = (1 - v) * H;
+  svCtx.beginPath();
+  svCtx.moveTo(px, py - 22); svCtx.lineTo(px + 22, py); svCtx.lineTo(px, py + 22); svCtx.lineTo(px - 22, py);
+  svCtx.closePath();
+  svCtx.fillStyle = hsl(base.h, base.s, base.l); svCtx.fill();
+  svCtx.lineWidth = 5; svCtx.strokeStyle = "#FFFFFF"; svCtx.stroke();
+  svCtx.lineWidth = 2; svCtx.strokeStyle = "#1A1A1A"; svCtx.stroke();
+
+  const hw = hueCv.width, hh = hueCv.height;
+  const hg = hueCtx.createLinearGradient(0, 0, hw, 0);
+  for (let i = 0; i <= 6; i++) hg.addColorStop(i / 6, "hsl(" + i * 60 + ",100%,50%)");
+  hueCtx.fillStyle = hg; hueCtx.fillRect(0, 0, hw, hh);
+  const hx = (base.h / 360) * hw;
+  hueCtx.fillStyle = "#FFFFFF"; hueCtx.fillRect(hx - 8, 0, 16, hh);
+  hueCtx.lineWidth = 3; hueCtx.strokeStyle = "#1A1A1A"; hueCtx.strokeRect(hx - 8, 1.5, 16, hh - 3);
+}
+
+function pickSquare(e) {
+  const r = svCv.getBoundingClientRect();
+  const x = clamp((e.clientX - r.left) / r.width, 0, 1);
+  const v = 1 - clamp((e.clientY - r.top) / r.height, 0, 1);
+  const l = v * (1 - x / 2);
+  const s = l === 0 || l === 1 ? 0 : (v - l) / Math.min(l, 1 - l);
+  base.s = Math.round(clamp(s, 0, 1) * 100);
+  base.l = Math.round(l * 100);
+  renderAll();
+}
+function pickHue(e) {
+  const r = hueCv.getBoundingClientRect();
+  base.h = Math.round(clamp((e.clientX - r.left) / r.width, 0, 1) * 359);
+  renderAll();
+}
+[[svCv, pickSquare], [hueCv, pickHue]].forEach(([cvEl, fn]) => {
+  let down = false;
+  cvEl.addEventListener("pointerdown", (e) => { down = true; cvEl.setPointerCapture(e.pointerId); fn(e); });
+  cvEl.addEventListener("pointermove", (e) => { if (down) fn(e); });
+  cvEl.addEventListener("pointerup", () => { down = false; });
+  cvEl.addEventListener("pointercancel", () => { down = false; });
+});
+
+/* ===== Dock: lock and release ===== */
+function setPinned(pinned) {
+  $("dockWrap").classList.toggle("pinned", pinned);
+  document.body.classList.toggle("dock-pinned", pinned);
+  $("pinBtn").setAttribute("aria-pressed", pinned);
+  $("pinBtn").title = pinned ? "Release the dock to the bottom of the page" : "Lock the dock to the screen";
+  $("pinLabel").textContent = pinned ? "Release" : "Lock";
+  $("pinIcon").innerHTML = pixelIcon(ICONS[pinned ? "lock" : "lockopen"], 2);
+  store.set("soc.dockPinned", pinned);
+}
+$("pinBtn").addEventListener("click", () => setPinned(!$("dockWrap").classList.contains("pinned")));
+
 /* ---------- start up ---------- */
+setPinned(store.get("soc.dockPinned", false));
 renderContrast();
 applyTheme(store.get("soc.theme", "moonlit-orchid"));
 pushRecent();
