@@ -1,4 +1,4 @@
-/// Starting palette
+// Starting palette
 const state = [
   { hex: "#FFEBEE", locked: false },
   { hex: "#F8BBD9", locked: false },
@@ -23,11 +23,13 @@ function hslToHex(h, s, l) {
   return ("#" + to(f(0)) + to(f(8)) + to(f(4))).toUpperCase();
 }
 
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
 function textOn(hex) {
   const n = parseInt(hex.slice(1), 16);
   const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
   const L = 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
-  return L > 0.35 ? "#3B1B47" : "#FFFFFF";
+  return L > 0.35 ? css("--plum") : "#FFFFFF";
 }
 
 function normaliseHex(v) {
@@ -106,7 +108,7 @@ function generate() {
 document.getElementById("generate").addEventListener("click", (e) => {
   generate();
   pushRecent();
-  burst(e.clientX, e.clientY, "#AB47BC");
+  burst(e.clientX, e.clientY);
 });
 document.getElementById("copyAll").addEventListener("click", () => {
   copy(state.map((s) => s.hex).join(", "), "Copied all five codes");
@@ -138,6 +140,8 @@ function showToast(msg) {
 /* ---------- sparkle burst (diamonds) ---------- */
 function burst(x, y, color) {
   if (reduceMotion) return;
+  const accent = color || css("--fuchsia");
+  const alt = css("--pink-manga");
   for (let n = 0; n < 10; n++) {
     const s = document.createElement("span");
     s.className = "spark";
@@ -145,7 +149,7 @@ function burst(x, y, color) {
     const dist = 40 + Math.random() * 60;
     s.style.left = x + "px";
     s.style.top = y + "px";
-    s.style.setProperty("--k", n % 2 ? color : "#F8BBD9");
+    s.style.setProperty("--k", n % 2 ? accent : alt);
     s.style.setProperty("--x", Math.cos(ang) * dist + "px");
     s.style.setProperty("--y", Math.sin(ang) * dist + "px");
     document.body.appendChild(s);
@@ -228,6 +232,8 @@ function show(name) {
   });
   if (history.replaceState) history.replaceState(null, "", "#" + name);
   if (name === "grimoire") renderGrimoire();
+  if (name === "contrast") renderContrast();
+  if (name === "mood") renderMood();
   window.scrollTo(0, 0);
 }
 tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.view)));
@@ -269,7 +275,7 @@ function diamond(x, y, size, fill) {
   ctx.moveTo(x, y - size); ctx.lineTo(x + size, y); ctx.lineTo(x, y + size); ctx.lineTo(x - size, y);
   ctx.closePath();
   ctx.fillStyle = fill; ctx.fill();
-  ctx.lineWidth = 3; ctx.strokeStyle = "#3B1B47"; ctx.stroke();
+  ctx.lineWidth = 3; ctx.strokeStyle = css("--plum"); ctx.stroke();
 }
 
 function drawWheel() {
@@ -287,7 +293,7 @@ function drawWheel() {
   }
   ctx.fillStyle = hsl(base.h, base.s, base.l);
   ctx.fillRect(c - r * 0.6, c - r * 0.6, r * 1.2, r * 1.2);
-  ctx.lineWidth = 3; ctx.strokeStyle = "#3B1B47";
+  ctx.lineWidth = 3; ctx.strokeStyle = css("--plum");
   ctx.strokeRect(c - r * 0.6, c - r * 0.6, r * 1.2, r * 1.2);
 
   const t = types[type];
@@ -295,7 +301,7 @@ function drawWheel() {
   hues.forEach((h, k) => {
     const a = (mod(h) * Math.PI) / 180 - Math.PI / 2;
     const rr = (R + r) / 2;
-    diamond(c + Math.cos(a) * rr, c + Math.sin(a) * rr, k === 0 ? 26 : 18, k === 0 ? "#FFFFFF" : "#FFEBEE");
+    diamond(c + Math.cos(a) * rr, c + Math.sin(a) * rr, k === 0 ? 26 : 18, k === 0 ? "#FFFFFF" : css("--pink-pale"));
   });
 }
 
@@ -346,6 +352,8 @@ function renderExplorer() {
   $("rIn").value = rgb.r; $("gIn").value = rgb.g; $("bIn").value = rgb.b;
   $("hIn").value = base.h; $("sIn").value = base.s; $("lIn").value = base.l;
   fill($("baseChip"), [hex]);
+  const bright = Math.round(((0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255) * 100);
+  $("exInfo").textContent = "Brightness " + bright + "%. Saturation " + base.s + "%. White text " + contrast(hex, "#FFFFFF").toFixed(1) + ":1. Dark text " + contrast(hex, "#1A1A1A").toFixed(1) + ":1.";
 
   const steps = [1, 2, 3, 4, 5];
   const rows = [
@@ -418,10 +426,10 @@ function pushRecent() {
 
 function saveBook() { store.set("soc.grimoire", grimoire); }
 
-function savePalette(colors) {
+function savePalette(colors, name) {
   grimoire.unshift({
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
-    name: "Untitled spell " + (grimoire.length + 1),
+    name: name || "Untitled spell " + (grimoire.length + 1),
     desc: "",
     col: "Personal favourites",
     colors: [...colors],
@@ -491,6 +499,7 @@ function savedCard(g) {
   row.append(
     smallButton("Use", () => loadToLab(g.colors)),
     smallButton("Copy", () => copy(g.name + ": " + g.colors.join(", "), "Copied " + g.name)),
+    smallButton("PNG", () => downloadPNG(g.colors, g.name)),
   );
   const del = smallButton("Delete", () => {
     if (!del.classList.contains("on")) {
@@ -546,13 +555,312 @@ function renderGrimoire() {
   list.replaceChildren(...items);
 }
 
-$("saveBtn").addEventListener("click", (e) => { savePalette(labColors()); burst(e.clientX, e.clientY, "#AB47BC"); });
+$("saveBtn").addEventListener("click", (e) => { savePalette(labColors()); burst(e.clientX, e.clientY); });
 $("copyBook").addEventListener("click", () => {
   if (!grimoire.length) { showToast("Your grimoire is empty"); return; }
   copy(grimoire.map((g) => g.name + " (" + g.col + ")" + (g.desc ? "\n" + g.desc : "") + "\n" + g.colors.join(", ")).join("\n\n"), "Copied your whole grimoire");
 });
 
+/* ===== Phase IV: Moodboard, Palette of the Day, spells ===== */
+const hexes = (t) => t.split(" ").map((x) => "#" + x);
+const mood = {
+  Aesthetics: {
+    "Dark Academia": hexes("2B2118 4A3728 6B4F3A 8C7355 C9B79C"),
+    "Light Academia": hexes("F5EBDD E6D5B8 CDB892 A68A64 6F5B3E"),
+    "Gothic Romance": hexes("1A0F1F 3D1630 6E1F3E A32A4B D9B8C4"),
+    "Vintage": hexes("EBDDC3 D9B382 C27C5A 8E5B4A 5C4A42"),
+    "Fairycore": hexes("E8F5E1 C5E8B7 F3C6E1 B7A8E8 8FD3C1"),
+    "Cottagecore": hexes("F6EDD9 E3C9A1 B7C58A 8FA06B C9826B"),
+    "Art Nouveau": hexes("2F4F3E 7A8F5A C5A34A E4D2A0 8A5A44"),
+    "Minimalism": hexes("FAFAF7 E6E4DF BDBAB3 8A8780 2E2D2B"),
+    "Cyberpunk": hexes("0D0221 261447 FF2A6D 05D9E8 D1F7FF"),
+    "Retro": hexes("F2A541 E4572E F3E3C3 2E8B8B 3B3355"),
+  },
+  Moods: {
+    "Mysterious": hexes("14101F 2D2547 4B3F72 7B6BA8 BDB3D9"),
+    "Romantic": hexes("FFE5EC FFC2D1 FF8FAB C9547A 7D2E4A"),
+    "Dreamy": hexes("E0D4F7 C8B6F0 A8D8F0 F7CFE5 FFF2D9"),
+    "Nostalgic": hexes("F0E1C6 D8B98A B98B6A 8C6A5A 5E4B4A"),
+    "Dramatic": hexes("0B0B0F 3A0F1A 8B1E2D D64545 F2E5D5"),
+    "Peaceful": hexes("E8F1EF CFE3DE A8CBC4 7FAEA6 4F8079"),
+    "Whimsical": hexes("FFD6E8 FFE8A3 C7F0D8 BFD8FF E3C4FF"),
+    "Melancholic": hexes("2C3544 46556B 6C7F99 9DAAB8 D3D9DF"),
+  },
+  Nature: {
+    "Forests": hexes("1F3B2D 35593F 5E8450 9AB87A D6E2B8"),
+    "Flowers": hexes("FFD9E8 FF9EC4 C86BAF 7C4B9E F6E58D"),
+    "Oceans": hexes("0C2D48 145DA0 2E8BC0 B1D4E0 E8F4F8"),
+    "Sunsets": hexes("3B1C4A 8E2C57 E4572E F29E4C F8D98B"),
+    "Autumn leaves": hexes("5A2A1A A0441F D9822B E8B04A 7A6A3A"),
+    "Mountains": hexes("1F2A38 4A5D70 8697A8 C7D1DB F2F5F8"),
+  },
+  Spells: {
+    "Enchantment": hexes("1B1033 3E1F6B 7B3FA8 C58BE8 F7D9FF"),
+    "Jealousy": hexes("0F2A1D 1F5A3A 4F9B5C A8C96B E3E8A0"),
+    "Serenity": hexes("EAF4F4 CFE6E8 A9D0D6 8DB6C4 6F93A8"),
+    "Chaos": hexes("FF2E63 FFE600 08D9D6 6A0DAD 111111"),
+    "Nostalgia": hexes("F2E3C6 DDB892 B08968 7F5539 9C6644"),
+    "Devotion": hexes("FFD6DD F4A6B7 D4577A 8F2D56 4A1942"),
+  },
+};
+const moodNotes = {
+  Aesthetics: "An aesthetic to borrow today.",
+  Moods: "A mood to wear today.",
+  Nature: "A piece of the outdoors to carry with you.",
+  Spells: "A spell to try today.",
+};
+let moodGroup = "Today";
+const moodItem = {};
+
+function paletteOfTheDay() {
+  const all = [];
+  Object.entries(mood).forEach(([g, items]) => Object.entries(items).forEach(([n, c]) => all.push({ g, n, c })));
+  const d = new Date();
+  const day = Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 864e5);
+  return all[day % all.length];
+}
+
+function renderMood() {
+  $("mGroups").replaceChildren(...["Today", ...Object.keys(mood)].map((g) => {
+    const b = smallButton(g, () => { moodGroup = g; renderMood(); });
+    b.classList.toggle("on", moodGroup === g);
+    return b;
+  }));
+
+  let cur;
+  const items = $("mItems");
+  if (moodGroup === "Today") {
+    items.replaceChildren();
+    cur = paletteOfTheDay();
+  } else {
+    const names = Object.keys(mood[moodGroup]);
+    if (!names.includes(moodItem[moodGroup])) moodItem[moodGroup] = names[0];
+    items.replaceChildren(...names.map((n) => {
+      const b = smallButton(n, () => { moodItem[moodGroup] = n; renderMood(); });
+      b.classList.toggle("on", moodItem[moodGroup] === n);
+      return b;
+    }));
+    const n = moodItem[moodGroup];
+    cur = { g: moodGroup, n, c: mood[moodGroup][n] };
+  }
+
+  const card = $("mCard");
+  const big = strip(cur.c);
+  big.classList.add("big");
+  const row = make("div", "pills");
+  row.append(
+    smallButton("Use", () => loadToLab(cur.c)),
+    smallButton("Save", () => savePalette(cur.c, cur.n)),
+    smallButton("Copy", () => copy(cur.n + ": " + cur.c.join(", "), "Copied " + cur.n)),
+  );
+  card.replaceChildren(
+    make("p", "why", moodGroup === "Today" ? "Palette of the Day" : cur.g),
+    make("h3", "feature-name", cur.n),
+    big,
+    make("p", "why", moodNotes[cur.g]),
+    row,
+  );
+  card.style.animation = "none";
+  void card.offsetWidth;
+  card.style.animation = "";
+}
+
+/* ---------- spells in the Laboratory ---------- */
+const rnd = (a, b) => a + Math.random() * (b - a);
+const shuffle = (a) => a.map((v) => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map((x) => x[1]);
+
+function applyList(list) {
+  state.forEach((item, i) => {
+    if (item.locked) return;
+    item.hex = list[i];
+    paint(i);
+    item.el.classList.remove("pop");
+    void item.el.offsetWidth;
+    item.el.classList.add("pop");
+  });
+  pushRecent();
+}
+
+$("surprise").addEventListener("click", (e) => {
+  applyList(Array.from({ length: 5 }, () => hsl(rnd(0, 360), rnd(30, 95), rnd(25, 85))));
+  burst(e.clientX, e.clientY);
+  showToast("Surprise!");
+});
+
+$("trickster").addEventListener("click", (e) => {
+  const h = rnd(0, 360);
+  const hues = [0, 137, 222, 45, 301].map((o) => h + o + rnd(-15, 15));
+  const sats = shuffle([95, 20, 85, 10, 100]);
+  const lights = shuffle([20, 90, 45, 70, 35]);
+  applyList(hues.map((x, i) => hsl(x, sats[i], lights[i])));
+  burst(e.clientX, e.clientY);
+  showToast("The Trickster strikes");
+});
+
+$("alchemist").addEventListener("click", (e) => {
+  let src = state.findIndex((s) => s.locked);
+  if (src < 0) src = 0;
+  const b = hexToHsl(state[src].hex);
+  const v = [
+    hsl(b.h + 25, b.s, b.l + 12),
+    hsl(b.h - 25, b.s, b.l - 12),
+    hsl(b.h + 180, b.s - 10, b.l),
+    hsl(b.h + 205, b.s, b.l + 18),
+  ];
+  let k = 0;
+  applyList(state.map((s, i) => (i === src ? s.hex : v[k++])));
+  burst(e.clientX, e.clientY);
+  showToast("Transformed from colour " + (src + 1));
+});
+
+
+/* ===== Themes (side tab) ===== */
+const THEMES = {
+  "moonlit-orchid": { name: "Moonlit Orchid",        dots: ["#FFEBEE", "#F8BBD9", "#CE93D8", "#BA68C8", "#AB47BC"] },
+  "berry-cauldron": { name: "Berry Cauldron", dots: ["#D66B9A", "#B83D78", "#8B2A5C", "#5C1A3B", "#2D0A1E"] },
+  "cherry-hex": { name: "Cherry Hex",     dots: ["#D64070", "#B82850", "#8A1E3C", "#5C1428", "#2E0A14"] },
+  "storm-charm": { name: "Storm Charm",    dots: ["#C7D4DF", "#8DA1B4", "#5A7186", "#374955", "#1E2832"] },
+  "mermaid-brew": { name: "Mermaid Brew",     dots: ["#90E0EF", "#00B4D8", "#0077B6", "#023E8A", "#03045E"] },
+  "candlelit-honey": { name: "Candlelit Honey", dots: ["#F5DEB3", "#E8C9A0", "#DEB887", "#D4A574", "#C9A86C"] },
+  "cupcake-coven": { name: "Cupcake Coven",      dots: ["#FF69B4", "#FFFACD", "#ADD8E6", "#F5DEB3", "#FFFFFF"] },
+  "dune-alchemist": { name: "Dune Alchemist",        dots: ["#F5DEB3", "#D4A574", "#C77B4A", "#8B4513", "#4A2C17"] },
+  "mossy-grimoire": { name: "Mossy Grimoire",     dots: ["#6BB89B", "#4A8B7A", "#2E5C5C", "#1A3D3D", "#0A1A1A"] },
+};
+const themesEl = $("themes");
+const themesPanel = $("themesPanel");
+
+themesPanel.appendChild(make("p", "vname", "Themes"));
+Object.entries(THEMES).forEach(([key, t]) => {
+  const b = make("button", "theme-opt");
+  b.type = "button";
+  b.dataset.theme = key;
+  b.appendChild(make("span", "", t.name));
+  const row = make("span", "dots");
+  t.dots.forEach((c) => { const d = document.createElement("i"); d.style.background = c; row.appendChild(d); });
+  b.appendChild(row);
+  b.addEventListener("click", () => applyTheme(key));
+  themesPanel.appendChild(b);
+});
+
+function toggleThemes(force) {
+  const open = force === undefined ? !themesEl.classList.contains("open") : force;
+  themesEl.classList.toggle("open", open);
+  $("themesTab").setAttribute("aria-expanded", open);
+}
+$("themesTab").addEventListener("click", () => toggleThemes());
+document.addEventListener("click", (e) => { if (themesEl.classList.contains("open") && !themesEl.contains(e.target)) toggleThemes(false); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") toggleThemes(false); });
+
+function applyTheme(key) {
+  if (!THEMES[key]) key = "moonlit-orchid";
+  document.documentElement.dataset.theme = key;
+  store.set("soc.theme", key);
+  [...themesPanel.querySelectorAll(".theme-opt")].forEach((b) => b.classList.toggle("on", b.dataset.theme === key));
+  state.forEach((_, i) => paint(i));
+  renderAll();
+  renderGrimoire();
+  renderMood();
+}
+
+/* ===== Phase V: contrast checker and PNG export ===== */
+function lum(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+}
+function contrast(a, b) {
+  const x = lum(a), y = lum(b);
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+let fgCol = "#3B1B47";
+let bgCol = "#FFEBEE";
+
+function renderContrast() {
+  $("fgPick").value = fgCol.toLowerCase(); $("fgHex").value = fgCol;
+  $("bgPick").value = bgCol.toLowerCase(); $("bgHex").value = bgCol;
+  const sample = $("sample");
+  sample.style.color = fgCol;
+  sample.style.background = bgCol;
+  const r = contrast(fgCol, bgCol);
+  $("ratio").textContent = (Math.floor(r * 100) / 100).toFixed(2) + " : 1";
+  $("verdict").textContent = r >= 7 ? "Excellent. Easy to read." : r >= 4.5 ? "Good for everyday text." : r >= 3 ? "Fine for big text and icons only." : "Too faint. Try another pair.";
+  const rules = [["Normal text, AA", 4.5], ["Normal text, AAA", 7], ["Large text, AA", 3], ["Large text, AAA", 4.5], ["Buttons and icons", 3]];
+  $("checks").replaceChildren(...rules.map(([name, min]) => {
+    const ok = r >= min;
+    const row = make("div", "check " + (ok ? "pass" : "fail"));
+    row.append(make("span", "", name), make("b", "", ok ? "✓ Pass" : "✕ Fail"));
+    return row;
+  }));
+}
+
+function setColour(which, value) {
+  const ok = normaliseHex(value);
+  if (!ok) { showToast("Use a hex code like #AB47BC"); renderContrast(); return; }
+  if (which === "fg") fgCol = ok; else bgCol = ok;
+  renderContrast();
+}
+$("fgPick").addEventListener("input", (e) => setColour("fg", e.target.value));
+$("bgPick").addEventListener("input", (e) => setColour("bg", e.target.value));
+$("fgHex").addEventListener("change", (e) => setColour("fg", e.target.value));
+$("bgHex").addEventListener("change", (e) => setColour("bg", e.target.value));
+$("swapColors").addEventListener("click", () => { [fgCol, bgCol] = [bgCol, fgCol]; renderContrast(); });
+$("bestPair").addEventListener("click", () => {
+  const c = labColors();
+  let best = [c[0], c[1], 0];
+  for (let i = 0; i < c.length; i++) for (let j = i + 1; j < c.length; j++) {
+    const r = contrast(c[i], c[j]);
+    if (r > best[2]) best = [c[i], c[j], r];
+  }
+  const [a, b] = best;
+  if (lum(a) < lum(b)) { fgCol = a; bgCol = b; } else { fgCol = b; bgCol = a; }
+  renderContrast();
+});
+
+/* ---------- PNG export ---------- */
+function paletteCanvas(colors, name) {
+  const W = 1500, H = 600, band = 70;
+  const cv2 = document.createElement("canvas");
+  cv2.width = W; cv2.height = H;
+  const g = cv2.getContext("2d");
+  const w = W / colors.length;
+  colors.forEach((hex, i) => {
+    g.fillStyle = hex;
+    g.fillRect(i * w, 0, w, H);
+    g.fillStyle = textOn(hex);
+    g.font = "700 38px Cinzel, serif";
+    g.textAlign = "left";
+    g.fillText(hex, i * w + 34, H - band - 34);
+  });
+  g.fillStyle = css("--pink-pale");
+  g.fillRect(0, H - band, W, band);
+  g.fillStyle = css("--plum");
+  g.font = "700 28px Cinzel, serif";
+  g.textAlign = "left";
+  g.fillText((name || "Palette").toUpperCase(), 34, H - 26);
+  g.textAlign = "right";
+  g.fillText("SORCERY OF COLOR", W - 34, H - 26);
+  return cv2;
+}
+function downloadPNG(colors, name) {
+  paletteCanvas(colors, name).toBlob((blob) => {
+    if (!blob) { showToast("Could not make the image"); return; }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = (name || "palette").toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    showToast("Palette image saved");
+  });
+}
+$("pngBtn").addEventListener("click", () => downloadPNG(labColors(), "Sorcery palette"));
+
 /* ---------- start up ---------- */
+renderContrast();
+applyTheme(store.get("soc.theme", "moonlit-orchid"));
 pushRecent();
 renderAll();
 show((location.hash || "#lab").slice(1));
