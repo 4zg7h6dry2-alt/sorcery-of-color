@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@500&family=Italiana&family=Libre+Baskerville:wght@400;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("soc.theme"))||"moonlit-orchid"}catch(e){}</script>
 </head>
 <body>
 
@@ -18,10 +19,11 @@
     <h1><span>Sorcery</span><span>of</span><span>Color</span></h1>
     <p class="motto">Where colours become magic.</p>
     <nav class="tabs" aria-label="Sections">
-      <button class="tab" data-view="lab" type="button" style="--i:0;--a:2deg;--c:#FFEBEE;--t:#3B1B47">Laboratory</button>
-      <button class="tab" data-view="harmony" type="button" style="--i:1;--a:12deg;--c:#F8BBD9;--t:#3B1B47">Harmony</button>
-      <button class="tab" data-view="explorer" type="button" style="--i:2;--a:22deg;--c:#CE93D8;--t:#3B1B47">Explorer</button>
-      <button class="tab" data-view="grimoire" type="button" style="--i:3;--a:32deg;--c:#AB47BC;--t:#FFFFFF">My Grimoire</button>
+      <button class="tab" data-view="lab" type="button" style="--i:0;--a:2deg;--c:var(--s1);--t:var(--on1)">Laboratory</button>
+      <button class="tab" data-view="harmony" type="button" style="--i:1;--a:12deg;--c:var(--s2);--t:var(--on2)">Harmony</button>
+      <button class="tab" data-view="explorer" type="button" style="--i:2;--a:22deg;--c:var(--s3);--t:var(--on3)">Explorer</button>
+      <button class="tab" data-view="mood" type="button" style="--i:3;--a:32deg;--c:var(--s4);--t:var(--on4)">Moodboard</button>
+      <button class="tab" data-view="grimoire" type="button" style="--i:4;--a:42deg;--c:var(--s5);--t:var(--on5)">My Grimoire</button>
     </nav>
   </header>
 
@@ -35,6 +37,11 @@
         <button class="cast" id="generate" type="button">Generate palette</button>
         <button class="ghost" id="copyAll" type="button">Copy all codes</button>
         <button class="ghost" id="saveBtn" type="button">Save to Grimoire</button>
+      </div>
+      <div class="pills spells">
+        <button class="pill" id="surprise" type="button">Surprise me</button>
+        <button class="pill" id="trickster" type="button">The Trickster</button>
+        <button class="pill" id="alchemist" type="button">The Alchemist</button>
       </div>
       <p class="tip">Press the space bar to generate. Lock a colour to keep it.</p>
     </section>
@@ -77,6 +84,14 @@
       </div>
     </section>
 
+    <!-- MOODBOARD -->
+    <section class="view" id="view-mood" hidden>
+      <h2 class="lab-title">Moodboard</h2>
+      <div class="pills" id="mGroups"></div>
+      <div class="pills mitems" id="mItems"></div>
+      <div class="gcard feature" id="mCard"></div>
+    </section>
+
     <!-- MY GRIMOIRE -->
     <section class="view" id="view-grimoire" hidden>
       <h2 class="lab-title">My Grimoire</h2>
@@ -90,6 +105,13 @@
   <footer class="foot">
     <p>Experiment freely. Create beautifully. Embrace a little chaos. ✦</p>
   </footer>
+
+  <aside class="themes" id="themes">
+    <button class="themes-tab" id="themesTab" type="button" aria-expanded="false" aria-controls="themesPanel" aria-label="Change theme">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L14.6 9.4 24 12 14.6 14.6 12 24 9.4 14.6 0 12 9.4 9.4Z"/></svg>
+    </button>
+    <div class="themes-panel" id="themesPanel"></div>
+  </aside>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="script.js"></script>
