@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@500&family=Libre+Baskerville:wght@400;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="studio.css">
   <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("soc.theme"))||"moonlit-orchid"}catch(e){}</script>
 </head>
 <body>
@@ -24,7 +25,8 @@
       <button class="tab" data-view="explorer" type="button" style="--i:2;--a:22deg;--c:var(--s3);--t:var(--on3)">Explorer</button>
       <button class="tab" data-view="contrast" type="button" style="--i:3;--a:32deg;--c:var(--s4);--t:var(--on4)">Contrast</button>
       <button class="tab" data-view="mood" type="button" style="--i:4;--a:42deg;--c:var(--s5);--t:var(--on5)">Moodboard</button>
-      <button class="tab" data-view="grimoire" type="button" style="--i:5;--a:52deg;--c:var(--s6);--t:var(--on6)">My Grimoire</button>
+      <button class="tab" data-view="studio" type="button" style="--i:5;--a:52deg;--c:var(--s6);--t:var(--on6)">Studio</button>
+      <button class="tab" data-view="grimoire" type="button" style="--i:6;--a:62deg;--c:var(--s7);--t:var(--on6)">My Grimoire</button>
     </nav>
   </header>
 
@@ -45,12 +47,12 @@
       <div id="dockWrap">
         <div class="remark-slot"><p class="remark" id="remark" aria-live="polite"></p></div>
         <div class="dock-box">
-          <button class="dock-tab" id="pinBtn" type="button" aria-pressed="false" title="Lock the dock to the screen"><span id="pinIcon"></span><span id="pinLabel">Lock</span></button>
+          <button class="dock-tab" id="pinBtn" type="button" aria-pressed="false" title="Lock the dock to the screen"><span id="pinLabel">Lock</span></button>
           <nav class="dock" aria-label="Palette controls">
-      <button class="dk gen" id="generate" type="button" title="Generate a new palette" aria-label="Generate a new palette"><span data-sprite="star" data-scale="2"></span><span>Generate</span></button>
-      <button class="dk" id="surprise" type="button" title="Surprise me: five random colours" aria-label="Surprise me: five random colours"><span data-sprite="dice" data-scale="3"></span><small>Surprise</small></button>
-      <button class="dk" id="trickster" type="button" title="The Trickster: unusual, clashing colours" aria-label="The Trickster: unusual, clashing colours"><span data-sprite="mask" data-scale="3"></span><small>Trickster</small></button>
-      <button class="dk" id="alchemist" type="button" title="The Alchemist: builds a palette around your locked colour" aria-label="The Alchemist: builds a palette around your locked colour"><span data-sprite="flask" data-scale="3"></span><small>Alchemist</small></button>
+      <button class="dk gen" id="generate" type="button" title="Generate a new palette" aria-label="Generate a new palette">Generate palette</button>
+      <button class="dk" id="surprise" type="button" title="Surprise me: five random colours" aria-label="Surprise me: five random colours">Surprise me</button>
+      <button class="dk" id="trickster" type="button" title="The Trickster: unusual, clashing colours" aria-label="The Trickster: unusual, clashing colours">The Trickster</button>
+      <button class="dk" id="alchemist" type="button" title="The Alchemist: builds a palette around your locked colour" aria-label="The Alchemist: builds a palette around your locked colour">The Alchemist</button>
     </nav>
         </div>
       </div>
@@ -63,12 +65,17 @@
         <div class="wheel-box"><canvas id="wheel" width="600" height="600" aria-label="Colour wheel. Tap or drag to choose a base hue."></canvas></div>
         <div class="panel">
           <div class="pills" id="types"></div>
-          <span class="vname">Free pick: drag anywhere</span>
-          <canvas id="svPick" width="600" height="420" aria-label="Free colour picker. Drag to choose how vivid and how bright."></canvas>
-          <canvas id="huePick" width="600" height="56" aria-label="Hue strip. Drag to choose the colour."></canvas>
           <div class="chips" id="harmonyChips"></div>
           <p class="why" id="why"></p>
           <div><button class="cast" id="toLab" type="button">Send to Laboratory</button></div>
+          <hr class="rule">
+          <span class="vname">Free pick</span>
+          <p class="why">Drag in the square, then slide the strip. It stays separate from the harmony colours above.</p>
+          <canvas id="svPick" width="600" height="420" aria-label="Free colour picker. Drag to choose how vivid and how bright."></canvas>
+          <canvas id="huePick" width="600" height="56" aria-label="Hue strip. Drag to choose the colour."></canvas>
+          <div class="chips" id="freeChip"></div>
+          <p class="why" id="freeInfo"></p>
+          <div class="pills"><button class="pill" id="freeToBase" type="button">Use as base colour</button></div>
         </div>
       </div>
     </section>
@@ -125,6 +132,13 @@
       <div class="gcard feature" id="mCard"></div>
     </section>
 
+    <!-- STUDIO -->
+    <section class="view" id="view-studio" hidden>
+      <h2 class="lab-title">Studio</h2>
+      <div class="pills" id="studioNav"></div>
+      <div class="tool" id="studioStage"></div>
+    </section>
+
     <!-- MY GRIMOIRE -->
     <section class="view" id="view-grimoire" hidden>
       <h2 class="lab-title">My Grimoire</h2>
@@ -145,5 +159,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="script.js"></script>
+  <script src="gradient.js"></script>
+  <script src="thief.js"></script>
 </body>
 </html>
