@@ -253,6 +253,7 @@ function show(name) {
   if (history.replaceState) history.replaceState(null, "", "#" + name);
   if (name === "grimoire") renderGrimoire();
   if (name === "contrast") renderContrast();
+  if (name === "studio") studioRefresh();
   if (name === "mood") renderMood();
   $("dockWrap").hidden = name !== "lab";
   window.scrollTo(0, 0);
@@ -413,7 +414,7 @@ $("hexIn").addEventListener("change", (e) => {
 function renderAll() {
   [...typesEl.children].forEach((b) => b.classList.toggle("on", b.textContent === type));
   drawWheel();
-  drawPicker();
+  renderFree();
   fill($("harmonyChips"), harmonyColors());
   $("why").textContent = types[type].why;
   renderExplorer();
@@ -1027,12 +1028,13 @@ function openHelp() {
 $("helpBtn").addEventListener("click", openHelp);
 
 /* ===== Harmony: free picker (square + hue strip) ===== */
+let free = { ...base };   // the free picker has its own colour, separate from the harmony base
 const svCv = $("svPick"), svCtx = svCv.getContext("2d");
 const hueCv = $("huePick"), hueCtx = hueCv.getContext("2d");
 
 function drawPicker() {
   const W = svCv.width, H = svCv.height;
-  svCtx.fillStyle = "hsl(" + base.h + ",100%,50%)";
+  svCtx.fillStyle = "hsl(" + free.h + ",100%,50%)";
   svCtx.fillRect(0, 0, W, H);
   let g = svCtx.createLinearGradient(0, 0, W, 0);
   g.addColorStop(0, "#fff"); g.addColorStop(1, "rgba(255,255,255,0)");
@@ -1042,14 +1044,14 @@ function drawPicker() {
   svCtx.fillStyle = g; svCtx.fillRect(0, 0, W, H);
 
   // where the current colour sits in the square
-  const l = base.l / 100, sl = base.s / 100;
+  const l = free.l / 100, sl = free.s / 100;
   const v = l + sl * Math.min(l, 1 - l);
   const sv = v === 0 ? 0 : 2 * (1 - l / v);
   const px = sv * W, py = (1 - v) * H;
   svCtx.beginPath();
   svCtx.moveTo(px, py - 22); svCtx.lineTo(px + 22, py); svCtx.lineTo(px, py + 22); svCtx.lineTo(px - 22, py);
   svCtx.closePath();
-  svCtx.fillStyle = hsl(base.h, base.s, base.l); svCtx.fill();
+  svCtx.fillStyle = hsl(free.h, free.s, free.l); svCtx.fill();
   svCtx.lineWidth = 5; svCtx.strokeStyle = "#FFFFFF"; svCtx.stroke();
   svCtx.lineWidth = 2; svCtx.strokeStyle = "#1A1A1A"; svCtx.stroke();
 
@@ -1057,7 +1059,7 @@ function drawPicker() {
   const hg = hueCtx.createLinearGradient(0, 0, hw, 0);
   for (let i = 0; i <= 6; i++) hg.addColorStop(i / 6, "hsl(" + i * 60 + ",100%,50%)");
   hueCtx.fillStyle = hg; hueCtx.fillRect(0, 0, hw, hh);
-  const hx = (base.h / 360) * hw;
+  const hx = (free.h / 360) * hw;
   hueCtx.fillStyle = "#FFFFFF"; hueCtx.fillRect(hx - 8, 0, 16, hh);
   hueCtx.lineWidth = 3; hueCtx.strokeStyle = "#1A1A1A"; hueCtx.strokeRect(hx - 8, 1.5, 16, hh - 3);
 }
@@ -1068,14 +1070,14 @@ function pickSquare(e) {
   const v = 1 - clamp((e.clientY - r.top) / r.height, 0, 1);
   const l = v * (1 - x / 2);
   const s = l === 0 || l === 1 ? 0 : (v - l) / Math.min(l, 1 - l);
-  base.s = Math.round(clamp(s, 0, 1) * 100);
-  base.l = Math.round(l * 100);
-  renderAll();
+  free.s = Math.round(clamp(s, 0, 1) * 100);
+  free.l = Math.round(l * 100);
+  renderFree();
 }
 function pickHue(e) {
   const r = hueCv.getBoundingClientRect();
-  base.h = Math.round(clamp((e.clientX - r.left) / r.width, 0, 1) * 359);
-  renderAll();
+  free.h = Math.round(clamp((e.clientX - r.left) / r.width, 0, 1) * 359);
+  renderFree();
 }
 [[svCv, pickSquare], [hueCv, pickHue]].forEach(([cvEl, fn]) => {
   let down = false;
@@ -1085,6 +1087,15 @@ function pickHue(e) {
   cvEl.addEventListener("pointercancel", () => { down = false; });
 });
 
+function renderFree() {
+  drawPicker();
+  const hex = hsl(free.h, free.s, free.l);
+  fill($("freeChip"), [hex]);
+  const { r, g, b } = hexToRgb(hex);
+  $("freeInfo").textContent = "RGB " + r + ", " + g + ", " + b + ".  HSL " + free.h + ", " + free.s + "%, " + free.l + "%.";
+}
+$("freeToBase").addEventListener("click", () => { base = { ...free }; renderAll(); showToast("Now the base colour"); });
+
 /* ===== Dock: lock and release ===== */
 function setPinned(pinned) {
   $("dockWrap").classList.toggle("pinned", pinned);
@@ -1092,10 +1103,32 @@ function setPinned(pinned) {
   $("pinBtn").setAttribute("aria-pressed", pinned);
   $("pinBtn").title = pinned ? "Release the dock to the bottom of the page" : "Lock the dock to the screen";
   $("pinLabel").textContent = pinned ? "Release" : "Lock";
-  $("pinIcon").innerHTML = pixelIcon(ICONS[pinned ? "lock" : "lockopen"], 2);
   store.set("soc.dockPinned", pinned);
 }
 $("pinBtn").addEventListener("click", () => setPinned(!$("dockWrap").classList.contains("pinned")));
+
+/* ===== Studio: a shelf for tools. Each tool lives in its own file and registers itself ===== */
+const STUDIO = { tools: [], active: null };
+function registerTool(id, label, build, onShow) {
+  STUDIO.tools.push({ id, label, build, onShow, el: null });
+  studioRefresh();
+}
+function studioRefresh() {
+  const stage = $("studioStage");
+  if (!stage || !STUDIO.tools.length) return;
+  if (!STUDIO.active) STUDIO.active = STUDIO.tools[0].id;
+  $("studioNav").replaceChildren(...STUDIO.tools.map((t) => {
+    const b = smallButton(t.label, () => { STUDIO.active = t.id; studioRefresh(); });
+    b.classList.toggle("on", t.id === STUDIO.active);
+    return b;
+  }));
+  STUDIO.tools.forEach((t) => {
+    if (!t.el) { t.el = make("div", "tool"); stage.appendChild(t.el); t.build(t.el); }
+    t.el.hidden = t.id !== STUDIO.active;
+  });
+  const cur = STUDIO.tools.find((t) => t.id === STUDIO.active);
+  if (cur && cur.onShow && !$("view-studio").hidden) cur.onShow(cur.el);
+}
 
 /* ---------- start up ---------- */
 setPinned(store.get("soc.dockPinned", false));
